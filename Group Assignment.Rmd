@@ -1,0 +1,61 @@
+---
+title: "Group Assignment"
+author: "Hannah Kim"
+date: "2024-05-28"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Generate Random Data
+
+```{r}
+GenerateData <- function(n) {
+  
+  # Generate unique IDs using LETTERS
+  Names <- c(LETTERS, paste0(LETTERS, LETTERS))[1:n]
+  
+  # Create an empty column for group assignment
+  Group <- rep(NA, n)
+  student_df <- data.frame(Student = Names, Group = Group, stringsAsFactors = FALSE)
+  student_matrix <- as.matrix(student_df)
+  
+  return(list(data_frame = student_df, matrix = student_matrix))
+}
+
+# Example
+n_students <- 10
+student_data <- GenerateData(n_students)
+print(student_data$data_frame)
+print(student_data$matrix)
+
+```
+
+# Assign Students to Groups
+
+```{r}
+MakeGroups <- function(data, num_groups) {
+  
+  # Take input of the number of students
+  num_students <- nrow(data$data_frame)
+  
+  # Generate random group assignments
+  group_assignments <- sample(rep(1:num_groups, length.out = num_students))
+  data$data_frame$Group <- group_assignments
+  data$matrix[, "Group"] <- as.character(group_assignments)
+  
+  return(data)
+}
+
+# Example
+
+n_students <- 10
+student_data <- GenerateData(n_students)
+num_groups <- 3
+grouped_data <- MakeGroups(student_data, num_groups)
+print(grouped_data$data_frame)
+print(grouped_data$matrix)
+```
+
