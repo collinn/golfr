@@ -12,50 +12,54 @@ knitr::opts_chunk$set(echo = TRUE)
 # Generate Random Data
 
 ```{r}
-GenerateData <- function(n) {
+n <- 5 
+
+GenerateData <- function(num_students) {
   
   # Generate unique IDs using LETTERS
-  Names <- c(LETTERS, paste0(LETTERS, LETTERS))[1:n]
+  Names <- c(LETTERS, paste(LETTERS))[seq_len(num_students)]
+  student_df <- data.frame(Student = Names, stringsAsFactors = FALSE)
   
-  # Create an empty column for group assignment
-  Group <- rep(NA, n)
-  student_df <- data.frame(Student = Names, Group = Group, stringsAsFactors = FALSE)
-  student_matrix <- as.matrix(student_df)
-  
-  return(list(data_frame = student_df, matrix = student_matrix))
+  return(student_df)
 }
 
 # Example
 n_students <- 10
 student_data <- GenerateData(n_students)
-print(student_data$data_frame)
-print(student_data$matrix)
+student_data
 
 ```
 
 # Assign Students to Groups
 
 ```{r}
-MakeGroups <- function(data, num_groups) {
+MakeGroups <- function(data, n, m) {
+  # Determine the number of students
+  num_students <- nrow(data)
   
-  # Take input of the number of students
-  num_students <- nrow(data$data_frame)
+  # Calculate the number of groups needed per iteration
+  num_groups <- ceiling(num_students / n)
   
-  # Generate random group assignments
-  group_assignments <- sample(rep(1:num_groups, length.out = num_students))
-  data$data_frame$Group <- group_assignments
-  data$matrix[, "Group"] <- as.character(group_assignments)
+  # Initialize a list to store group assignments for each iteration
+  group_assignments_list <- list()
   
-  return(data)
+  for (i in seq_len(m)) {
+    shuffled_students <- sample(data$Student)
+    group_assignments <- sample(rep(seq_len(num_groups), each = n, length.out = num_students))
+    group_assignments_list[[paste("Round_", i)]] <- group_assignments
+  }
+  
+  # Combine the original data with the group assignments
+  combined_data <- cbind(data, do.call(cbind, group_assignments_list))
+  
+  return(combined_data)
 }
 
-# Example
-
-n_students <- 10
+n_students <- 4
 student_data <- GenerateData(n_students)
-num_groups <- 3
-grouped_data <- MakeGroups(student_data, num_groups)
-print(grouped_data$data_frame)
-print(grouped_data$matrix)
+students_per_group <- 2
+iterations <- 4
+grouped_data <- MakeGroups(student_data, students_per_group, iterations)
+grouped_data
 ```
 
