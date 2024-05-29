@@ -33,20 +33,51 @@ student_data
 # Assign Students to Groups
 
 ```{r}
-MakeGroups <- function(data, n, m) {
+# Function to assign students to groups
+MakeGroups <- function(data, students_per_group, iterations) {
   # Determine the number of students
   num_students <- nrow(data)
   
   # Calculate the number of groups needed per iteration
-  num_groups <- ceiling(num_students / n)
+  num_groups <- ceiling(num_students / students_per_group)
   
   # Initialize a list to store group assignments for each iteration
   group_assignments_list <- list()
   
-  for (i in seq_len(m)) {
+  for (i in seq_len(iterations)) {
+    # Shuffle the students
     shuffled_students <- sample(data$Student)
-    group_assignments <- sample(rep(seq_len(num_groups), each = n, length.out = num_students))
-    group_assignments_list[[paste("Round_", i)]] <- group_assignments
+    
+    # Create initial group assignments
+    group_assignments <- rep(seq_len(num_groups), each = students_per_group, length.out = num_students)
+    
+    # Distribute any remaining students among the existing groups
+    remaining_students <- num_students %% students_per_group
+    if (remaining_students != 0) {
+      extra_indices <- (num_students - remaining_students + 1):num_students
+      extra_groups <- sample(seq_len(num_groups), remaining_students)
+      group_assignments[extra_indices] <- extra_groups
+    }
+    
+    # Ensure no group has only one student
+    group_counts <- table(group_assignments)
+    while (any(group_counts == 1)) {
+      single_group <- as.integer(names(group_counts[group_counts == 1]))
+      single_student_index <- which(group_assignments == single_group)
+      other_groups <- as.integer(names(group_counts[group_counts != 1]))
+      new_group <- sample(other_groups, 1)
+      group_assignments[single_student_index] <- new_group
+      group_counts <- table(group_assignments)
+    }
+    
+    # Combine students with their groups
+    iteration_groups <- data.frame(Student = shuffled_students, Group = group_assignments)
+    
+    # Order by original student order
+    iteration_groups <- iteration_groups[order(match(iteration_groups$Student, data$Student)), ]
+    
+    # Add group assignments to the list with the appropriate column name
+    group_assignments_list[[paste0("Round_", i)]] <- iteration_groups$Group
   }
   
   # Combine the original data with the group assignments
@@ -55,11 +86,14 @@ MakeGroups <- function(data, n, m) {
   return(combined_data)
 }
 
-n_students <- 4
+```
+
+```{r}
+n_students <- 13
 student_data <- GenerateData(n_students)
-students_per_group <- 2
-iterations <- 4
-grouped_data <- MakeGroups(student_data, students_per_group, iterations)
+n <- 3
+m <- 3
+grouped_data <- MakeGroups(student_data, n, m)
 grouped_data
 ```
 
