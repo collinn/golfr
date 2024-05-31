@@ -33,8 +33,6 @@ student_data
 # Assign Students to Groups
 
 ```{r}
-# Assign Students to Groups
-
 MakeGroups <- function(data, students_per_group, iterations) {
   # Determine the number of students
   num_students <- nrow(data)
