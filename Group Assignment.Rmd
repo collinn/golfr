@@ -129,13 +129,39 @@ result
 
 ## Matrix (Initial)
 ```{r}
-student_data <- GenerateData(n_students)
-n <- length(student_data)
+# Function to initialize the student interaction matrix
+## -99 can be replaced with -(n-1) when n = number of rows (students)
+InitMat <- function(students) {
+  n <- length(students)
+  InitMat <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
+  diag(InitMat) <- -99
+  return(InitMat)
+}
 
-group_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(student_data, student_data))
+test <- InitMat(student_data$Student)
 
-diag(group_matrix) <- 1
-print(group_matrix)
+```
+
+```{r}
+# Function to update the interaction matrix based on group assignments
+UpdateMat <- function(InitMat, groupAssignments, students) {
+  numGroups <- length(unique(groupAssignments))
+  
+  for (g in seq_len(numGroups)) {
+    groupMembers <- students[groupAssignments == g,]
+    for (j in seq_along(groupMembers)) {
+      for (k in seq_along(groupMembers)) {
+        if (j != k) {
+          InitMat[groupMembers[j], groupMembers[k]] <- 1
+        }
+      }
+    }
+  }
+  
+  return(InitMat)
+}
+
+UpdateMat(test, c(1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 4L), student_data)
 
 ```
 
