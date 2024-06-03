@@ -127,3 +127,15 @@ result
 
 ```
 
+## Matrix (Initial)
+```{r}
+student_data <- GenerateData(n_students)
+n <- length(student_data)
+
+group_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(student_data, student_data))
+
+diag(group_matrix) <- 1
+print(group_matrix)
+
+```
+
