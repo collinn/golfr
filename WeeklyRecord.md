@@ -7,4 +7,5 @@ and students per group with iteration (overlap not considered)
 
 ## June 3-7, Week 2
 - MAP Proposal Part A, B completed
-- Generated inital matrix
+- Generated initial matrix
+- Generated `UpdateMat`to reflect the group assignment to the matrix
