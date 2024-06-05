@@ -7,3 +7,7 @@ dosomething <- function(dat, id) {
 }
 
 dosomething(df, id = "Name")
+
+
+# tesat something with function
+x <- funciotn()))))

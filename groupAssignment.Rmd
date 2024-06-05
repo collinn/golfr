@@ -123,7 +123,7 @@ test_overlap <- function(N, k, r) {
 N <- 3
 k <- 2
 r <- 2
-result <- test_overlap(N, k, r)
+result <- test_overlap(N, k, r) # change output to boolean
 result
 
 ```
@@ -170,6 +170,8 @@ UpdateMat(test, c(1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 4L), student_d
 
 # Matrix to Group Assignment
 ```{r}
+## Intermat in loop should be matrix of assignments
+
 # Function to assign groups again based on the updated interaction matrix
 MatmakeGroups <- function(Intermat, studentsPerGroup) {
   students <- rownames(Intermat)
@@ -189,7 +191,7 @@ MatmakeGroups <- function(Intermat, studentsPerGroup) {
     availableStudents <- students[is.na(groupAssignments)]
     
     # Find the student with the fewest current pairings
-    minPairings <- apply(interactionMatrix[availableStudents, availableStudents], 1, sum)
+    minPairings <- apply(Intermat[availableStudents, availableStudents], 1, sum)
     firstStudent <- availableStudents[which.min(minPairings)]
     
     # Initialize group with the first student
@@ -198,7 +200,7 @@ MatmakeGroups <- function(Intermat, studentsPerGroup) {
     
     while (length(currentGroup) < studentsPerGroup && length(currentGroup) < length(availableStudents)) {
       # Find the next student with the fewest pairings to the current group
-      pairSums <- colSums(interactionMatrix[currentGroup, availableStudents])
+      pairSums <- colSums(Intermat[currentGroup, availableStudents, drop = FALSE])
       nextStudent <- availableStudents[which.min(pairSums)]
       
       # Add the next student to the current group
@@ -222,11 +224,13 @@ MatmakeGroups <- function(Intermat, studentsPerGroup) {
 
 # Example Usage
 
-nStudents <- 10
+nStudents <- 13
 studentData <- GenerateData(nStudents)
 studentsPerGroup <- 3
 iterations <- 2
-result <- MatmakeGroups(studentData, studentsPerGroup, iterations)
+Intermat <- InitMat(student_data$Student)
+
+result <- MatmakeGroups(Intermat, studentsPerGroup)
 
 # Print results
 print(result$combinedData)
