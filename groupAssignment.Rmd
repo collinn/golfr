@@ -12,8 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 # Generate Random Data
 
 ```{r}
-n <- 5 
-
 GenerateData <- function(num_students) {
   
   # Generate unique IDs using LETTERS
@@ -171,75 +169,78 @@ UpdateMat(test, c(1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 4L), student_d
 
 # Matrix to Group Assignment
 ```{r}
-## Intermat in loop should be matrix of assignments
-
-# Function to assign groups again based on the updated interaction matrix
-MatmakeGroups <- function(Intermat, studentsPerGroup) {
-  students <- rownames(Intermat)
-  numStudents <- length(students)
-  
-  # Check if the matrix is already full of 1s (except diagonal)
-  if (all(Intermat[Intermat != -99] == 1)) {
-    stop("All possible unique group combinations have been used.")
-  }
-  
-  # Initialize variables
-  numGroups <- ceiling(numStudents / studentsPerGroup)
-  groupAssignments <- rep(NA, numStudents)
-  
-  for (g in seq_len(numGroups)) {
-    # Find available students for the current group
-    availableStudents <- students[is.na(groupAssignments)]
-    
-    # Find the student with the fewest current pairings
-    minPairings <- apply(Intermat[availableStudents, availableStudents], 1, sum)
-    firstStudent <- availableStudents[which.min(minPairings)]
-    
-    # Initialize group with the first student
-    currentGroup <- firstStudent
-    groupAssignments[which(students == firstStudent)] <- g
-    
-    while (length(currentGroup) < studentsPerGroup && length(currentGroup) < length(availableStudents)) {
-      # Find the next student with the fewest pairings to the current group
-      pairSums <- colSums(Intermat[currentGroup, availableStudents, drop = FALSE])
-      nextStudent <- availableStudents[which.min(pairSums)]
-      
-      # Add the next student to the current group
-      currentGroup <- c(currentGroup, nextStudent)
-      groupAssignments[which(students == nextStudent)] <- g
-    }
-  }
-  
-  # Assign remaining students to existing groups if any
-  remainingStudents <- students[is.na(groupAssignments)]
-  if (length(remainingStudents) > 0) {
-    for (student in remainingStudents) {
-      groupCounts <- table(groupAssignments, useNA = "no")
-      smallestGroup <- as.integer(names(groupCounts)[which.min(groupCounts)])
-      groupAssignments[which(students == student)] <- smallestGroup
-    }
-  }
-  
-  return(groupAssignments)
-}
-
-# Example Usage
-
-nStudents <- 13
-studentData <- GenerateData(nStudents)
-studentsPerGroup <- 3
-iterations <- 2
-Intermat <- InitMat(student_data$Student)
-
-result <- MatmakeGroups(Intermat, studentsPerGroup)
-
-# Print results
-print(result$combinedData)
-print(result$interactionMatrix)
-
-# Assign groups again based on the updated matrix
-newGroupAssignments <- AssignGroupsAgain(result$interactionMatrix, studentsPerGroup)
-print(newGroupAssignments)
+# ## Intermat in loop should be matrix of assignments
+# 
+# # Function to assign groups again based on the updated interaction matrix
+# MatmakeGroups <- function(Intermat, studentsPerGroup) {
+#   students <- rownames(Intermat)
+#   numStudents <- length(students)
+#   
+#   # Check if the matrix is already full of 1s (except diagonal)
+#   if (all(Intermat[Intermat != -99] == 1)) {
+#     stop("All possible unique group combinations have been used.")
+#   }
+#   
+#   # Initialize variables
+#   numGroups <- ceiling(numStudents / studentsPerGroup)
+#   groupAssignments <- rep(NA, numStudents)
+#   
+#   for (g in seq_len(numGroups)) {
+#     # Find available students for the current group
+#     availableStudents <- students[is.na(groupAssignments)]
+#     
+#     # Find the student with the fewest current pairings
+#     minPairings <- apply(Intermat[availableStudents, availableStudents], 1, sum)
+#     firstStudent <- availableStudents[which.min(minPairings)]
+#     
+#     # Initialize group with the first student
+#     currentGroup <- firstStudent
+#     groupAssignments[which(students == firstStudent)] <- g
+#     
+#     while (length(currentGroup) < studentsPerGroup && length(currentGroup) < length(availableStudents)) {
+#       # Find the next student with the fewest pairings to the current group
+#       pairSums <- colSums(Intermat[currentGroup, availableStudents, drop = FALSE])
+#       nextStudent <- availableStudents[which.min(pairSums)]
+#       
+#       # Add the next student to the current group
+#       currentGroup <- c(currentGroup, nextStudent)
+#       groupAssignments[which(students == nextStudent)] <- g
+#     }
+#   }
+#   
+#   # Assign remaining students to existing groups if any
+#   remainingStudents <- students[is.na(groupAssignments)]
+#   if (length(remainingStudents) > 0) {
+#     for (student in remainingStudents) {
+#       groupCounts <- table(groupAssignments, useNA = "no")
+#       smallestGroup <- as.integer(names(groupCounts)[which.min(groupCounts)])
+#       groupAssignments[which(students == student)] <- smallestGroup
+#     }
+#   }
+#   
+#   return(groupAssignments)
+# }
+# 
+# # Example Usage
+# 
+# nStudents <- 13
+# studentData <- GenerateData(nStudents)
+# studentsPerGroup <- 3
+# iterations <- 2
+# Intermat <- InitMat(student_data$Student)
+# 
+# result <- MatmakeGroups(Intermat, studentsPerGroup)
+# 
+# # Print results
+# print(result$combinedData)
+# print(result$interactionMatrix)
+# 
+# # Assign groups again based on the updated matrix
+# newGroupAssignments <- AssignGroupsAgain(result$interactionMatrix, studentsPerGroup)
+# print(newGroupAssignments)
 ```
 
+```{r}
+
+```
 
