@@ -10,23 +10,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Generate Random Data
-
 ```{r}
-GenerateData <- function(num_students) {
-  
-  # Generate unique IDs using LETTERS
-  Names <- c(LETTERS, paste(LETTERS))[seq_len(num_students)]
-  student_df <- data.frame(Student = Names, stringsAsFactors = FALSE)
-  
-  return(student_df)
-}
-
-# Example
-n_students <- 10
-student_data <- GenerateData(n_students)
-student_data
-
+# GenerateData function moved to separate .R file
 ```
+
 
 # Assign Students to Groups
 
