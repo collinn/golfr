@@ -113,9 +113,9 @@ test_overlap <- function(N, k, r) {
   unique_combinations <- choose(N, k)
   # Check for overlap conditions
   if (unique_combinations <= m * (r - 1)) {
-    return("Yes Overlap starting from the second round")
+    return(TRUE)
   } else {
-    return("No Overlap until the third round")
+    return(FALSE)
   }
 }
 
@@ -123,7 +123,7 @@ test_overlap <- function(N, k, r) {
 N <- 3
 k <- 2
 r <- 2
-result <- test_overlap(N, k, r) # change output to boolean
+result <- test_overlap(N, k, r)
 result
 
 ```
@@ -140,6 +140,7 @@ InitMat <- function(students) {
 }
 
 test <- InitMat(student_data$Student)
+test
 
 ```
 
@@ -240,4 +241,5 @@ print(result$interactionMatrix)
 newGroupAssignments <- AssignGroupsAgain(result$interactionMatrix, studentsPerGroup)
 print(newGroupAssignments)
 ```
+
 
