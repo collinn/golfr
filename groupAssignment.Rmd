@@ -18,113 +18,25 @@ knitr::opts_chunk$set(echo = TRUE)
 # Assign Students to Groups
 
 ```{r}
-MakeGroups <- function(data, students_per_group, iterations) {
-  # Determine the number of students
-  num_students <- nrow(data)
-  
-  # Calculate the number of groups needed per iteration
-  num_groups <- ceiling(num_students / students_per_group)
-  
-  # Initialize a list to store group assignments for each iteration
-  group_assignments_list <- list()
-  group_assignments_list <- vector("list", length = iterations)
-  
-  for (i in seq_len(iterations)) {
-    # Shuffle the students
-    shuffled_students <- sample(data$Student)
-    
-    # Create initial group assignments
-    group_assignments <- rep(seq_len(num_groups), 
-                             each = students_per_group, 
-                             length.out = num_students)
-    
-    ## This will always put extra students in existing groups
-    ## Maybe want to create a new group if rem_stud/n_group > 1/2
-    # Distribute any remaining students among the existing groups
-    remaining_students <- num_students %% students_per_group
-    if (remaining_students != 0) {
-      extra_indices <- (num_students - remaining_students + 1):num_students
-      extra_groups <- sample(seq_len(num_groups-1), remaining_students)
-      group_assignments[extra_indices] <- extra_groups
-    }
-    
-    ## Fixed by adding `num_groups - 1` above
-    # # Ensure no group has only one student
-    # group_counts <- table(group_assignments)
-    # while (any(group_counts == 1)) {
-    #   single_group <- as.integer(names(group_counts[group_counts == 1]))
-    #   single_student_index <- which(group_assignments == single_group)
-    #   other_groups <- as.integer(names(group_counts[group_counts != 1]))
-    #   new_group <- sample(other_groups, 1)
-    #   group_assignments[single_student_index] <- new_group
-    #   group_counts <- table(group_assignments)
-    # }
-    
-    # Combine students with their groups
-    iteration_groups <- data.frame(Student = shuffled_students, Group = group_assignments)
-    
-    # Order by original student order
-    iteration_groups <- iteration_groups[order(match(iteration_groups$Student, data$Student)), ]
-    
-    # Add group assignments to the list with the appropriate column name
-    group_assignments_list[[paste0("Round_", i)]] <- iteration_groups$Group
-  }
-  
-  # Combine the original data with the group assignments
-  combined_data <- cbind(data, do.call(cbind, group_assignments_list))
-  
-  return(combined_data)
-}
-
+# MakeGroups function moved to separate .R file
 ```
 
 ```{r}
-# Example Usage
-n_students <- 13
-student_data <- GenerateData(n_students)
-n <- 3
-m <- 3
-grouped_data <- MakeGroups(student_data, n, m)
-grouped_data
-
-```
-
-```{r}
-# Function to determine if there will be overlap
-testoverlap <- function(N, k, r) {
-  # Calculate the total number of groups needed per iteration
-  m <- ceiling(N / k)
-  # Calculate the number of unique possible groups
-  unique_combinations <- choose(N, k)
-  # Check for overlap conditions
-  if (unique_combinations <= m * (r - 1)) {
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
-}
-
-# Example usage
-N <- 3
-k <- 2
-r <- 2
-result <- testoverlap(N, k, r)
-result
-
+# testoverlap function moved to separate .R file
 ```
 
 ## Matrix (Initial)
 ```{r}
 # Function to initialize the student interaction matrix
 ## -99 can be replaced with -(n-1) when n = number of rows (students)
-InitMat <- function(students) {
+initMat <- function(students) {
   n <- length(students)
-  InitMat <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
-  diag(InitMat) <- -99
+  initMat <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
+  diag(initMat) <- -99
   return(InitMat)
 }
 
-test <- InitMat(student_data$Student)
+test <- initMat(student_data$Student)
 test
 
 ```
