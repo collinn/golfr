@@ -27,43 +27,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Matrix (Initial)
 ```{r}
-# Function to initialize the student interaction matrix
-## -99 can be replaced with -(n-1) when n = number of rows (students)
-initMat <- function(students) {
-  n <- length(students)
-  initMat <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
-  diag(initMat) <- -99
-  return(InitMat)
-}
-
-test <- initMat(student_data$Student)
-test
-
+# initmat function moved to separate .R file
 ```
 
 # Group Assignment to Matrix
 
 ```{r}
-# Function to update the interaction matrix based on group assignments
-UpdateMat <- function(InitMat, groupAssignments, students) {
-  numGroups <- length(unique(groupAssignments))
-  
-  for (g in seq_len(numGroups)) {
-    groupMembers <- students[groupAssignments == g,]
-    for (j in seq_along(groupMembers)) {
-      for (k in seq_along(groupMembers)) {
-        if (j != k) {
-          InitMat[groupMembers[j], groupMembers[k]] <- 1
-        }
-      }
-    }
-  }
-  
-  return(InitMat)
-}
-
-UpdateMat(test, c(1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 4L), student_data)
-
+# updatemat function moved to separate .R file
 ```
 
 # Matrix to Group Assignment
