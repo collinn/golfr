@@ -91,7 +91,7 @@ grouped_data
 
 ```{r}
 # Function to determine if there will be overlap
-test_overlap <- function(N, k, r) {
+testoverlap <- function(N, k, r) {
   # Calculate the total number of groups needed per iteration
   m <- ceiling(N / k)
   # Calculate the number of unique possible groups
@@ -108,7 +108,7 @@ test_overlap <- function(N, k, r) {
 N <- 3
 k <- 2
 r <- 2
-result <- test_overlap(N, k, r)
+result <- testoverlap(N, k, r)
 result
 
 ```
