@@ -11,3 +11,4 @@ in the group who were assigned together before
 - Generated `UpdateMat`to reflect the group assignment to the matrix
 - Moved `GenerateData`, `MakeGroups`, `testoverlap`, `initmat`, and `updatemat`
 to separate .R in `functions` file
+- `testmat` to check if there is any unpaired students in the matrix
