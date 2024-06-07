@@ -1,0 +1,183 @@
+---
+title: "assignr"
+author: "Rajvardhan Jhanwar"
+date: "2024-06-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# FUNCTION --> (TEST) Generate Random Data 
+# This function creates data for testing purpose 
+
+```{r}
+
+GenerateData <- function(num_students) 
+{
+  Names <- c(LETTERS, paste(LETTERS))[seq_len(num_students)]
+  student_df <- data.frame(Student = Names, stringsAsFactors = FALSE)
+  
+  return(student_df)
+}
+
+```
+
+
+# FUNCTION --> (INITIALIZER) Create Matrix
+# This function creates an empty identity matrix with -1 and students as row and 
+# column names.
+
+```{r}
+
+CreateMatrix <- function(data, s)
+{
+  mat <- diag(-1, s, s)
+  rownames(mat) <- data$Student
+  colnames(mat) <- data$Student
+  
+  return(mat)
+}
+
+```
+
+
+# This function checks if two students can be grouped together or not
+
+```{r}
+
+NotGroupedBefore <- function(matrix, student1, student2) 
+{
+  return(matrix[student1, student2] == 0)
+}
+
+```
+
+
+# This function randomly assigns students into groups keeping in mind they can't 
+# be in the same group unless no possible combinations are left
+
+```{r}
+
+AssignGroups <- function(s, check, spg, i) 
+{
+  student_names <- rownames(check)
+  
+  diag(check) <- NA
+
+  # Create a matrix to track the number of unique pairings each student has had
+  pairings <- matrix(0, nrow = 1, ncol = s)
+  colnames(pairings) <- student_names
+  
+  for (iteration in 1:i) 
+  {
+    remaining <- student_names
+    groups <- list()
+
+    while (length(remaining) >= spg) 
+    {
+      possible_group <- TRUE
+      attempt_count <- 0
+
+      while (possible_group && attempt_count < 1000) {
+        group <- sample(remaining, size = spg)
+
+        # Check if this group can be formed (all pairs are new or necessary repeats)
+        if (all(sapply(1:(spg-1), function(x) all(check[group[x], group[-(1:x)]] <= 0, na.rm = TRUE)))) {
+          possible_group <- FALSE
+        }
+
+        attempt_count <- attempt_count + 1
+      }
+      
+      if (attempt_count == 1000) {
+        break  # To avoid infinite loop
+      }
+      
+      groups[[length(groups) + 1]] <- group
+      remaining <- setdiff(remaining, group)
+
+      # Update the matrix and pairings count
+      check <- UpdateMat(group, check)
+      for (person in group) {
+        pairings[1, person] <- pairings[1, person] + spg - 1
+      }
+    }
+
+    if (length(remaining) > 0) {
+      groups[[length(groups) + 1]] <- remaining
+      check <- UpdateMat(remaining, check)
+      for (person in remaining) {
+        pairings[1, person] <- pairings[1, person] + length(remaining) - 1
+      }
+    }
+
+    Print(groups, check, iteration, pairings)
+  }
+  
+  return(check)
+}
+```
+
+
+
+```{r}
+
+# Update the matrix to reflect the new group
+UpdateMat <- function(group, check)
+{
+  for (p1 in group) 
+  {
+    for (p2 in group) 
+    {
+      if (p1 != p2) {
+        check[p1, p2] <- check[p1, p2] + 1
+        check[p2, p1] <- check[p2, p1] + 1
+      }
+    }
+  }
+  
+  return(check)
+}
+
+```
+
+
+# TEST FUNCTION
+
+```{r}
+
+Print <- function(groups, check, iteration, pairings) {
+  print(paste("Iteration", iteration, "groups formed:"))
+  print(groups)
+  print("Current state of pairing matrix:")
+  print(check)
+  print("Current state of pairings count:")
+  print(pairings)
+}
+
+```
+
+
+
+### TESTER
+```{r}
+
+i <- 3                        ## User Input 
+spg <- 2                      ## User Input
+up <- FALSE                   ## User Input
+
+s <- 5                        ## NEEDS TO BE DETERMINED FROM 'data'
+data <- GenerateData(s)     ## User Input
+
+
+# STEPS -->
+
+## INITIALIZING
+check <- CreateMatrix(data, s)
+
+(check <- AssignGroups(s, check, spg, i))
+
+```
