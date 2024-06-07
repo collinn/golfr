@@ -112,16 +112,16 @@ knitr::opts_chunk$set(echo = TRUE)
 # Check if each row of matrix has unpaired student(s)
 ```{r}
 # Function to check for remaining 'r-1' values and assign groups if necessary
-testmat <- function(initmat, student_data, students_per_group, iterations) {
-  num_students <- nrow(initmat)
+testmat <- function(initialmat, student_data, students_per_group, iterations) {
+  num_students <- nrow(initialmat)
   
   for (r in seq_len(iterations)) {
     # Check each row for remaining 'r-1' values
     for (i in seq_len(num_students)) {
-      if (any(initmat[i, ] == (r-1))) {
+      if (any(initialmat[i, ] == (r-1))) {
         # If found, proceed to assign groups for this iteration
         new_groups <- MakeGroups(student_data, students_per_group, 1)
-        initmat <- updatemat(initmat, new_groups$Round_1, student_data)
+        initialmat <- updatemat(initialmat, new_groups$Round_1, student_data$Student)
       } else {
         # If no remaining 'r-1' values, pass
         next
@@ -129,7 +129,7 @@ testmat <- function(initmat, student_data, students_per_group, iterations) {
     }
   }
   
-  return(initmat)
+  return(initialmat)
 }
 
 
@@ -138,11 +138,12 @@ student_data <- GenerateData(n_students)
 students_per_group <- 3
 iterations <- 1
 grouped_data <- MakeGroups(student_data, students_per_group, iterations)
-initial_matrix <- initmat(student_data$Student)
+M <- initmat(student_data$Student)
 
-updated_matrix <- updatemat(initial_matrix, grouped_data, student_data$Student)
+updated_matrix <- updatemat(M, grouped_data$Round_1, student_data$Student)
 
 final_matrix <- testmat(updated_matrix, student_data, students_per_group, iterations)
 
+final_matrix
 ```
 
