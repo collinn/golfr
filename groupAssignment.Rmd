@@ -36,103 +36,29 @@ knitr::opts_chunk$set(echo = TRUE)
 # updatemat function moved to separate .R file
 ```
 
-# Matrix to Group Assignment
 ```{r}
-# ## Intermat in loop should be matrix of assignments
-# 
-# # Function to assign groups again based on the updated interaction matrix
-# MatmakeGroups <- function(Intermat, studentsPerGroup) {
-#   students <- rownames(Intermat)
-#   numStudents <- length(students)
+# # Function to check for remaining 'r-1' values and assign groups if necessary
+# testmat <- function(initialmat, student_data, students_per_group, iterations) {
+#   num_students <- nrow(initialmat)
 #   
-#   # Check if the matrix is already full of 1s (except diagonal)
-#   if (all(Intermat[Intermat != -99] == 1)) {
-#     stop("All possible unique group combinations have been used.")
-#   }
-#   
-#   # Initialize variables
-#   numGroups <- ceiling(numStudents / studentsPerGroup)
-#   groupAssignments <- rep(NA, numStudents)
-#   
-#   for (g in seq_len(numGroups)) {
-#     # Find available students for the current group
-#     availableStudents <- students[is.na(groupAssignments)]
-#     
-#     # Find the student with the fewest current pairings
-#     minPairings <- apply(Intermat[availableStudents, availableStudents], 1, sum)
-#     firstStudent <- availableStudents[which.min(minPairings)]
-#     
-#     # Initialize group with the first student
-#     currentGroup <- firstStudent
-#     groupAssignments[which(students == firstStudent)] <- g
-#     
-#     while (length(currentGroup) < studentsPerGroup && length(currentGroup) < length(availableStudents)) {
-#       # Find the next student with the fewest pairings to the current group
-#       pairSums <- colSums(Intermat[currentGroup, availableStudents, drop = FALSE])
-#       nextStudent <- availableStudents[which.min(pairSums)]
-#       
-#       # Add the next student to the current group
-#       currentGroup <- c(currentGroup, nextStudent)
-#       groupAssignments[which(students == nextStudent)] <- g
+#   for (r in seq_len(iterations)) {
+#     # Check each row for remaining 'r-1' values
+#     for (i in seq_len(num_students)) {
+#       if (any(initialmat[i, ] == (r-1))) {
+#         # If found, proceed to assign groups for this iteration
+#         new_groups <- MakeGroups(student_data, students_per_group, 1)
+#         initialmat <- updatemat(initialmat, new_groups$Round_1, student_data$Student)
+#       } else {
+#         # If no remaining 'r-1' values, pass
+#         next
+#       }
 #     }
 #   }
 #   
-#   # Assign remaining students to existing groups if any
-#   remainingStudents <- students[is.na(groupAssignments)]
-#   if (length(remainingStudents) > 0) {
-#     for (student in remainingStudents) {
-#       groupCounts <- table(groupAssignments, useNA = "no")
-#       smallestGroup <- as.integer(names(groupCounts)[which.min(groupCounts)])
-#       groupAssignments[which(students == student)] <- smallestGroup
-#     }
-#   }
-#   
-#   return(groupAssignments)
+#   return(initialmat)
 # }
 # 
-# # Example Usage
 # 
-# nStudents <- 13
-# studentData <- GenerateData(nStudents)
-# studentsPerGroup <- 3
-# iterations <- 2
-# Intermat <- InitMat(student_data$Student)
-# 
-# result <- MatmakeGroups(Intermat, studentsPerGroup)
-# 
-# # Print results
-# print(result$combinedData)
-# print(result$interactionMatrix)
-# 
-# # Assign groups again based on the updated matrix
-# newGroupAssignments <- AssignGroupsAgain(result$interactionMatrix, studentsPerGroup)
-# print(newGroupAssignments)
-```
-
-# Check if each row of matrix has unpaired student(s)
-```{r}
-# Function to check for remaining 'r-1' values and assign groups if necessary
-testmat <- function(initialmat, student_data, students_per_group, iterations) {
-  num_students <- nrow(initialmat)
-  
-  for (r in seq_len(iterations)) {
-    # Check each row for remaining 'r-1' values
-    for (i in seq_len(num_students)) {
-      if (any(initialmat[i, ] == (r-1))) {
-        # If found, proceed to assign groups for this iteration
-        new_groups <- MakeGroups(student_data, students_per_group, 1)
-        initialmat <- updatemat(initialmat, new_groups$Round_1, student_data$Student)
-      } else {
-        # If no remaining 'r-1' values, pass
-        next
-      }
-    }
-  }
-  
-  return(initialmat)
-}
-
-
 n_students <- 9
 student_data <- GenerateData(n_students)
 students_per_group <- 3
@@ -142,8 +68,10 @@ M <- initmat(student_data$Student)
 
 updated_matrix <- updatemat(M, grouped_data$Round_1, student_data$Student)
 
-final_matrix <- testmat(updated_matrix, student_data, students_per_group, iterations)
+updated_matrix
+```
 
-final_matrix
+```{r}
+# groupassign function moved to separate .R file
 ```
 
