@@ -8,7 +8,11 @@ in the group who were assigned together before
 ## June 3-7, Week 2
 - MAP Proposal Part A, B completed
 - Generated initial matrix `initmat`
-- Generated `UpdateMat`to reflect the group assignment to the matrix
+- Generated `updatemat`to reflect the group assignment to the matrix
 - Moved `GenerateData`, `MakeGroups`, `testoverlap`, `initmat`, and `updatemat`
 to separate .R in `functions` file
 - `testmat` to check if there is any unpaired students in the matrix
+  (maybe for the future use)
+
+## June 10-14, Week 3
+- `groupassign` function generated that loops through `MakeGroups` and `updatemat`
