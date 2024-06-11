@@ -16,3 +16,6 @@ to separate .R in `functions` file
 
 ## June 10-14, Week 3
 - `groupassign` function generated that loops through `MakeGroups` and `updatemat`
+- `updatemat` has been adjusted to reflect multiple iterations on the matrix
+- Initial matrix has added in the arguments of `MakeGroups`
+- `groupassign` now returns the data frame with lists (saved after each iteration) as final output
