@@ -6,23 +6,31 @@ groupassign <- function(student_data, students_per_group, iterations) {
   # Initialize the interaction matrix
   initial_matrix <- initmat(student_data$Student)
   
+  # Initialize a list to store the matrix after each iteration
+  matrices_list <- vector("list", length = iterations)
+  
   # Loop through iterations
   for (r in seq_len(iterations)) {
-    # Assign groups
-    grouped_data <- MakeGroups(student_data, students_per_group, 1)
+    # Assign groups and update the interaction matrix
+    final_matrix <- MakeGroups(student_data, students_per_group, 1, initial_matrix)
     
-    # Update the interaction matrix
-    initial_matrix <- updatemat(initial_matrix, grouped_data$Round_1, 
-                                student_data$Student)
+    # Save the final_matrix after each iteration to the list
+    matrices_list[[r]] <- final_matrix
+    
+    # Update the initial matrix for the next iteration
+    initial_matrix <- final_matrix
   }
   
-  return(initial_matrix)
+  # Combine the list into a data frame of lists
+  matrices_df <- data.frame(iteration = seq_len(iterations), matrix = I(matrices_list))
+  
+  return(matrices_df)
 }
 
-n_students <- 9
+n_students <- 4
 student_data <- GenerateData(n_students)
-students_per_group <- 3
-iterations <- 280
+students_per_group <- 2
+iterations <- 3
 
-final_matrix <- groupassign(student_data, students_per_group, iterations)
-final_matrix
+matrices_df <- groupassign(student_data, students_per_group, iterations)
+matrices_df
