@@ -28,36 +28,19 @@ MakeGroups <- function(data, students_per_group, iterations, initial_matrix) {
       extra_groups <- sample(seq_len(num_groups-1), remaining_students)
       group_assignments[extra_indices] <- extra_groups
     }
-    
-#     # Combine students with their groups
-#     iteration_groups <- data.frame(Student = shuffled_students, Group = group_assignments)
-#     
-#     # Order by original student order
-#     iteration_groups <- iteration_groups[order(match(iteration_groups$Student, data$Student)), ]
-#     
-#     # Add group assignments to the list with the appropriate column name
-#     group_assignments_list[[paste0("Round_", i)]] <- iteration_groups$Group
-#   }
-#   
-#   # Combine the original data with the group assignments
-#   combined_data <- cbind(data, do.call(cbind, group_assignments_list))
-#   
-#   return(combined_data)
-# }
-    
-    for (g in seq_len(num_groups)) {
-      groupMembers <- shuffled_students[group_assignments == g]
-      for (j in seq_along(groupMembers)) {
-        for (k in seq_along(groupMembers)) {
-          if (j != k) {
-            rn <- which(rownames(initial_matrix) == groupMembers[j])
-            cn <- which(colnames(initial_matrix) == groupMembers[k])
-            initial_matrix[rn, cn] <- 1
-          }
-        }
-      }
-    }
+
+    # Combine students with their groups
+    iteration_groups <- data.frame(Student = shuffled_students, Group = group_assignments)
+
+    # Order by original student order
+    iteration_groups <- iteration_groups[order(match(iteration_groups$Student, data$Student)), ]
+
+    # Add group assignments to the list with the appropriate column name
+    group_assignments_list[[paste0("Round_", i)]] <- iteration_groups$Group
   }
-  
-  return(initial_matrix)
+
+  # Combine the original data with the group assignments
+  combined_data <- cbind(data, do.call(cbind, group_assignments_list))
+
+  return(combined_data)
 }
