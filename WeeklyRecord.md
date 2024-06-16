@@ -19,3 +19,6 @@ to separate .R in `functions` file
 - `updatemat` has been adjusted to reflect multiple iterations on the matrix
 - Initial matrix has added in the arguments of `MakeGroups`
 - `groupassign` now returns the data frame with lists (saved after each iteration) as final output
+- 'MakeGroups' is supposed to return all the data frames combined after each round (Issue \# 2)
+
+## June 17-21, Week 4
