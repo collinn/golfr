@@ -21,4 +21,5 @@ to separate .R in `functions` file
 - `groupassign` now returns the data frame with lists (saved after each iteration) as final output
 - 'MakeGroups' is supposed to return all the data frames combined after each round (Issue \# 2)
 
+
 ## June 17-21, Week 4
