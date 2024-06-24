@@ -1,0 +1,134 @@
+---
+title: "AdvancedR_ch2"
+author: "Hannah Kim"
+date: "2024-06-17"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 2.1.3
+### 1
+
+There are logical, integer, double(numeric), character, complex and raw atomic
+vectors.
+The atomic vectors are different from the lists because the elements of the lists
+can be of any type, including lists.
+
+### 2
+`is.vector()` and `is.numeric()` both do not test if an object is a vector(or numeric vector).
+They both return `TRUE` only if the object is a vector with no attributes
+or a number (both integer and double vectors).
+
+### 3
+```{r}
+# 1 0
+c(1, FALSE)
+
+# "a" "1"
+c("a", 1)
+
+# Returns the list that has: a list that has 1 as component, and another list that has "a" as component
+c(list(1), "a")
+
+# 1 1 (1 and 1L difference?)
+c(TRUE, 1L)
+c(1L, TRUE)
+```
+
+### 4
+If the elements of a list have different types, `as.vector()` would not work; 
+instead, `unlist()` uses the same coercion rules as `c()` to convert a list to an atomic vector.
+
+### 5
+1 =="1" is true due to type coercion. 
+When comparing a numeric value (1) and a character value ("1"), R automatically coerces
+the character to a numeric value if possible. 
+Thus, "1" is coerced to 1, and 1 == 1 is true.
+-1 < FALSE is true because in R, logical values can be coerced to integers 
+where `FALSE` becomes 0 and `TRUE` becomes 1.
+Therefore, the comparison -1 < `FALSE` is equivalent to -1 < 0, which is true.
+"one" < 2 is false because when comparing a character value ("one") with a numeric value (2),
+R does not coerce the character to a numeric value because "one" cannot be interpreted as a number.
+
+### 6
+The default `NA` in R is a logical vector of length 1 because logical is the simplest type
+in R's type hierarchy.
+Logical vectors are special because they can be coerced into other types
+(integer, double, character) seamlessly.
+For instance, `TRUE` becomes 1 and `FALSE` becomes 0 when coerced to numeric types.
+
+## Exercise 2.2.2
+### 1
+The attribute is not missing; it is there but not displayed because
+the comment attribute is not one of the core attributes that print displays by default.
+The print function in R does not display attributes other than names, dimensions, and class by default.
+
+### 2
+When you modify the levels of a factor, the internal integer representation of the factor
+remains the same, but the corresponding level labels are updated to the new values you assign.
+Here, the levels of f1 are reversed; that is, the first level becomes the last,
+the second level becomes the second last, and so on.
+
+### 3
+```{r}
+f2 <- rev(factor(letters))
+```
+
+This code reverses the factor levels and then applies the rev function to the factor.
+This means that the factor f2 will have the reversed order of the levels of f1,
+but the factor levels themselves are not reversed, just the ordering of the factor elements.
+
+```{r}
+f3 <- factor(letters, levels = rev(letters))
+```
+
+This code creates a factor with the levels explicitly set to the reversed order of letters.
+This means that the factor f3 will have the elements in the same order as f1,
+but the levels will be reversed.
+
+## Exercise 2.3.1
+### 1
+When dim() is applied to a vector, it returns `NULL`. 
+
+### 2
+If `is.matrix(x)` is `TRUE`, then `is.array(x)` will also return `TRUE`.
+In R, a matrix is a special case of an array with two dimensions.
+Therefore, any object that is a matrix is also an array, but not all arrays are matrices.
+
+### 3
+```{r}
+x1 <- array(1:5, c(1, 1, 5))
+x2 <- array(1:5, c(1, 5, 1))
+x3 <- array(1:5, c(5, 1, 1))
+```
+
+`x1` is a 3-dimensional array with dimensions 1x1x5.
+It represents a single row with 5 columns in a 3-dimensional space.
+`x2` is a 3-dimensional array with dimensions 1x5x1.
+It represents a single column with 5 rows in a 3-dimensional space. 
+`x3` is a 3-dimensional array with dimensions 5x1x1.
+It represents a 5-element vector but arranged as a 3-dimensional array.
+
+## Exercise 2.4.5
+### 1
+A data frame in R possesses several attributes including: `names()`,
+which is a character vector giving the names of the columns, `colnames()`,
+providing the same column names, and `rownames()`, a character vector giving the names of the rows.
+Additionally, a data frame has a `class` attribute always set to `"data.frame"`, 
+indicating its type, and a `dim` attribute representing the dimensions of the data frame,
+i.e., the number of rows and columns.
+
+### 2
+When as.matrix() is applied to a data frame with columns of different types,
+it coerces all the columns to the same type, usually to the most general type 
+that can accommodate all the data.
+If a data frame has numeric and character columns, the numeric data will be coerced to
+character to maintain a consistent type across the entire matrix.
+This is because matrices can only hold elements of the same type,
+unlike data frames that can hold elements of different types in different columns.
+
+### 3
+Yes, you can have a data frame with 0 rows and/or 0 columns.
