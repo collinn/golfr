@@ -32,6 +32,7 @@ MakeGroups <- function(data, students_per_group, iterations, initial_matrix) {
       group_assignments[extra_indices] <- extra_groups
     }
 
+    #initial_matrix <- updatemat(initial_matrix, shuffled_students, group_assignments)
     # Update the matrix
     for (g in seq_len(num_groups)) {
       groupMembers <- shuffled_students[group_assignments == g]
@@ -46,6 +47,9 @@ MakeGroups <- function(data, students_per_group, iterations, initial_matrix) {
       }
     }
     # Add group assignments to the list
+    iteration_groups <- data.frame(Student = shuffled_students, 
+                                   round = group_assignments)
+    names(iteration_groups) <- c("Student", paste0("Round", i))
     group_assignments_list[[i]] <- iteration_groups
   }
   
