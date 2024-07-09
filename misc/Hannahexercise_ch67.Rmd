@@ -1,0 +1,318 @@
+---
+title: "AdvancedR_ch6&7"
+author: "Hannah Kim"
+date: "2024-07-06"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 6.1.2
+### 1
+
+We can check if an object is a function using the `is.function()`.
+To determine if a function is a primitive function, we can use the `is.primitive()` function.
+
+### 2
+```{r}
+objs <- mget(ls("package:base"), inherits = TRUE)
+funs <- Filter(is.function, objs)
+```
+
+#### a
+```{r}
+args_count <- sapply(funs, function(x) length(formals(x)))
+most_args_function <- names(which.max(args_count))
+most_args_function
+```
+
+#### b
+```{r}
+no_args_count <- sum(sapply(funs, function(x) length(formals(x)) == 0))
+no_args_functions <- names(funs)[sapply(funs, function(x) length(formals(x)) == 0)]
+no_args_count
+```
+
+Functions with no arguments are often used as constants or to perform actions that do not require input parameters.
+These functions can be used to return fixed values or execute code that doesn't need external data.
+
+#### c
+```{r}
+primitive_funs <- Filter(is.primitive, funs)
+```
+
+### 3
+The three important components of a function in R are the `body()`, which contains the code inside the function, the `formals()`, which is the list of arguments that control how the function can be called, and the `environment()`, which is the map of the location of the function's variables.
+
+### 4
+Printing a function does not show the environment it was created in if the function was created in the global environment.
+
+## Exercise 6.4.6
+### 1
+```{r}
+x <- sample(replace = TRUE, 20, x = c(1:10, NA))
+```
+
+In this call to `sample()`, the replace argument is specified first using its name, the second argument is the size (`20`), and the x argument is specified last using its name.
+This call generates a sample of size 20 from the vector `c(1:10, NA)` with replacement.
+
+```{r}
+y <- runif(min = 0, max = 1, 20)
+```
+
+In this call to `runif()`, the `min` and `max` arguments are specified using their names, while the `n` argument is specified by position as the last argument.
+This generates 20 random numbers uniformly distributed between 0 and 1.
+
+```{r}
+cor(m = "k", y = y, u = "p", x = x)
+```
+
+This call to `cor()` uses non-standard argument names (`m` and `u`) to refer to the `method` and `use` arguments, respectively.
+The `method` argument specifies the method to be used for correlation (`"k"` for Kendall) and the `use` argument specifies how to handle missing values (`"p"` for pairwise.complete.obs).
+The `x` and `y` arguments specify the vectors to be correlated.
+
+### 2
+This function returns `2`.
+The default value for `x` is `{y <- 1; 2}`, which sets `y` to 1 and then returns 2.
+The default value for `y` is `0`.
+Therefore, `f1()` returns `x + y`, which is `2 + 0`. This illustrates the principle of lazy evaluation, where the expression for the default value of `x` is evaluated only when `x` is needed, and `y` within the default expression for `x` does not affect the default value of the formal parameter `y`.
+
+### 3
+This function returns an error because `z` is not defined when the default value for `x` is evaluated.
+The function tries to assign `100` to `z` after `x` has already been set to the value of `z`, which causes an error due to the undefined variable `z`.
+This illustrates the principle that default argument expressions are evaluated in the environment in which the function is called, not in the function's own environment.
+
+## Exercise 6.5.3
+### 1
+```{r}
+objs <- mget(ls("package:base"), inherits = TRUE)
+replacement_funs <- Filter(function(x) is.function(x) && grepl("<-$", deparse(substitute(x))), objs)
+```
+
+```{r}
+primitive_replacement_funs <- Filter(is.primitive, replacement_funs)
+```
+
+Replacement functions in the base package that are primitive functions include `names<-`, `dimnames<-`, `dim<-`, and others that are implemented using `.Primitive()`.
+
+### 2
+Valid names for user-created infix functions in R must start and end with the `%` character. The sequence of characters in between can be any valid sequence except `%` itself.
+For example, `%my_op%`, `%+%`, `%xor%`, and `%_custom_%` are valid infix function names.
+
+### 3
+```{r}
+`%xor%` <- function(a, b) {
+  (a | b) & !(a & b)
+}
+# Example usage:
+TRUE %xor% FALSE  # Returns TRUE
+TRUE %xor% TRUE   # Returns FALSE
+FALSE %xor% FALSE # Returns FALSE
+
+```
+
+### 4
+```{r}
+`%intersect%` <- function(x, y) {
+  intersect(x, y)
+}
+`%union%` <- function(x, y) {
+  union(x, y)
+}
+`%setdiff%` <- function(x, y) {
+  setdiff(x, y)
+}
+# Example usage:
+1:5 %intersect% 4:8
+1:5 %union% 4:8      
+1:5 %setdiff% 4:8 
+```
+
+### 5
+```{r}
+`random_replace<-` <- function(x, value) {
+  idx <- sample(seq_along(x), 1)
+  x[idx] <- value
+  x
+}
+# Example usage:
+vec <- 1:10
+random_replace(vec) <- 99
+vec
+```
+
+## Exercise 6.6.2
+### 1
+The `chdir` parameter of the `source()` function allows you to change the working directory to the directory containing the file being sourced.
+This can be convenient if you need to source a script that relies on relative paths.
+In contrast, the `in_dir()` function from the `withr` package temporarily changes the working directory for the duration of the code execution and then restores the original working directory.
+This approach is often preferred because it ensures the working directory is always returned to its original state, regardless of whether an error occurs during the execution of the code block.
+
+### 2
+The function that undoes the action of `library()` is `detach()`.
+To save and restore the values of `options()` and `par()`, we can use `old_options <- options()` and `old_par <- par()`, and then restore them with `options(old_options)` and `par(old_par)`, respectively.
+Using `on.exit()` ensures that the original settings are restored even if the function exits early due to an error.
+
+### 3
+```{r}
+run_with_graphics_device <- function(device, file, code) {
+  device(file)
+  on.exit(dev.off(), add = TRUE)
+  force(code)
+}
+# Example usage:
+run_with_graphics_device(png, "plot.png", {
+  plot(1:10, 1:10)
+})
+```
+
+### 4
+The `capture.output2()` function provided is a simplified version of `capture.output()`.
+The primary differences are that `capture.output2()` explicitly uses `tempfile()` to create a temporary file and ensures that both the file and the sink are removed after execution by using `on.exit()` with `add = TRUE`.
+This function forces the evaluation of the code with `force(code)` and reads the lines from the temporary file.
+In comparison, `capture.output()` has more features and options for handling different types of output and edge cases.
+The simplified version makes the key ideas easier to see by focusing on the core functionality of capturing output and cleaning up resources.
+
+## Exercise 7.2.5
+### 1
+To determine whether `t.test()` is an S3 generic or an S3 method, we need to check its source code.
+The source code for `t.test()` shows that it calls `UseMethod("t.test")`, which confirms that it is an S3 generic function.
+If you create an object with class `test` and call `t()` with it, the function `t()` will attempt to find a method `t.test` for the class `test`.
+If no such method exists, it will fall back to the default method, typically resulting in an error or unexpected behavior because `t()` is not designed to handle objects of class `test`.
+
+### 2
+The classes in base R that have a method for the Math group generic include "numeric", "integer", "complex", "logical", "character", "factor", "ordered", "data.frame", and "POSIXct".
+These methods work by performing the corresponding mathematical operations on the elements of the objects.
+The actual methods for each class are written in C and are part of the internal R codebase.
+
+### 3
+R has two classes for representing date-time data, POSIXct and POSIXlt, both of which inherit from POSIXt. 
+Generics that have different behaviors for these two classes include `as.character`, `as.POSIXlt`, `format`, and `summary`.
+Generics that share the same behavior include `as.double`, `as.numeric`, `is.finite`, `is.infinite`, and `is.na`.
+The different behaviors are typically due to how the date-time data is stored and manipulated internally within these classes.
+
+### 4
+The base generic function with the greatest number of defined methods is `print()`.
+It has methods for almost every class, allowing it to handle a wide variety of object types in a specific way.
+This ensures that objects are printed in a human-readable format, regardless of their underlying structure.
+
+### 5
+```{r}
+y <- 1
+g <- function(x) {
+  y <- 2
+  UseMethod("g")
+}
+g.numeric <- function(x) y
+g(10)
+
+```
+
+When `g(10)` is called, `UseMethod("g")` dispatches to `g.numeric` because `10` is numeric.
+The method g.numeric accesses y, which is 1 in the global environment, not the local y inside g(). Therefore, g(10) returns 1.
+
+```{r}
+h <- function(x) {
+  x <- 10
+  UseMethod("h")
+}
+h.character <- function(x) paste("char", x)
+h.numeric <- function(x) paste("num", x)
+h("a")
+```
+
+When h("a") is called, UseMethod("h") dispatches to h.character because "a" is a character. The method h.character then uses the argument x, resulting in paste("char", "a"), which returns "char a".
+
+### 6
+```{r}
+f <- function() 1
+g <- function() 2
+class(g) <- "function"
+class(f)
+class(g) 
+length(f)
+length(g)
+```
+
+The function `length()` behaves differently because it is an internal generic and does not dispatch on the implicit class.
+The `length.function` method returns "function" for `g` because `g` is explicitly given the class "function". 
+The function `otype()` can be used to distinguish between these behaviors as it shows the true object type.
+
+## Exercises 7.3.5
+### 1
+The S4 generic with the most methods defined for it is `plot`, and the S4 class with the most methods associated with it is `"numeric"`.
+These methods allow for extensive customization and extension of plotting and numeric operations in R.
+
+### 2
+If you define a new S4 class that doesn’t “contain” an existing class, it will be considered a virtual class.
+Virtual classes cannot have instances directly; they serve as abstract base classes that can be extended by other classes.
+This design allows for more flexible and reusable class hierarchies.
+
+### 3
+If you pass an S4 object to an S3 generic, the S3 generic will not recognize the S4 object and will use the default method or fail, depending on the implementation of the generic.
+On the other hand, if you pass an S3 object to an S4 generic, the S4 system uses the `setOldClass()` function to recognize the S3 class and dispatch the appropriate S4 method.
+This function bridges the S3 and S4 systems by allowing S4 methods to handle S3 objects.
+
+## Exercises 7.4.4
+### 1
+```{r}
+Account <- setRefClass("Account",
+  fields = list(
+    .balance = "numeric",
+    balance = function(value) {
+      if (missing(value)) {
+        .self$.balance
+      } else {
+        stop("Direct modification of balance is not allowed.")
+      }
+    }
+  ),
+  methods = list(
+    initialize = function(balance = 0) {
+      .balance <<- balance
+    },
+    deposit = function(amount) {
+      .balance <<- .balance + amount
+    },
+    withdraw = function(amount) {
+      if (.balance < amount) {
+        stop("Insufficient funds")
+      } else {
+        .balance <<- .balance - amount
+      }
+    }
+  )
+)
+
+# Example usage
+acc <- Account$new(balance = 100)
+acc$balance  # 100
+acc$deposit(50)
+acc$balance  # 150
+# acc$balance <- 200  # Error: Direct modification of balance is not allowed.
+
+```
+
+This code defines an Account class with a hidden .balance field and a public balance field that only allows reading, not direct modification.
+The balance can only be changed using the deposit and withdraw methods.
+
+### 2
+```{r}
+library(methods)
+
+# Get all classes
+all_classes <- getClasses()
+
+# Filter classes that extend envRefClass
+envRefClass_descendants <- all_classes[sapply(all_classes, function(class) {
+  inherits(getClass(class), "envRefClass")
+})]
+
+envRefClass_descendants
+```
+
+Classes that extend from `envRefClass` include `envRefClass` itself and any custom reference classes defined in user packages or sessions.
+These classes are used for creating reference-based object-oriented classes in R, allowing for mutable state and encapsulation of methods and fields within an environment.
+Reference classes are particularly useful for modeling stateful objects and complex data structures.
