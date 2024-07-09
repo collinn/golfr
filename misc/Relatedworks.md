@@ -44,3 +44,42 @@ The Social Golfer Problem (SGP) is a combinatorial optimization problem that inv
    - Focus on minimizing conflicts through strategic swaps.
    - Use tabu lists to prevent cycling back to previous configurations.
    - Make random swaps if no progress is observed after several iterations.
+
+# A greedy algorithm for the social golfer and the Oberwolfach problem #
+
+The **Social Golfer Problem (SGP)** involves scheduling golfers into groups such that no two golfers play together more than once. Specifically, it generalizes to scheduling `n` golfers into `g` groups of `p` players each for `w` weeks while ensuring that no two golfers share a group more than once.
+
+## Solutions Presented
+1. **Greedy Algorithm for SGP**
+   - The algorithm focuses on a greedy approach to iteratively remove cliques (groups) of size `k` from the complete graph of players.
+   - It guarantees a minimum number of rounds that can be scheduled without preplanning.
+
+2. **Mathematical Guarantees**
+   - For any tournament with `n` players and match sizes of `k`, the greedy algorithm can always guarantee `⌊n / (k(k-1))⌋` rounds.
+   - This bound is proven to be tight, meaning it's the best possible guarantee for the greedy algorithm.
+
+3. **Extensions and Applications**
+   - The greedy algorithm is applied to the Oberwolfach problem, which involves seating assignments at round tables ensuring no two participants sit next to each other more than once.
+   - The approach can be adapted for different sports and tournament formats, providing a polynomial time approximation algorithm for the SGP.
+
+## Insights
+1. The SGP ensures no repeat pairings in scheduled groups.
+2. The greedy algorithm effectively manages groupings by iteratively removing cliques.
+3. Mathematical proofs validate the algorithm's effectiveness and bounds.
+
+### The Essence (80/20)
+- **Core Topic:** SGP requires scheduling groups without repeat pairings.
+- **Detailed Description:** The greedy algorithm schedules rounds by iteratively removing cliques of players from a complete graph, guaranteeing a specific minimum number of rounds. This method provides a simple yet effective solution for the SGP and related problems like the Oberwolfach problem.
+
+## Plan
+1. **Implement Greedy Algorithm**
+   - Apply the algorithm to iteratively remove cliques from the player graph.
+   - Ensure to follow the mathematical guarantees for the number of rounds.
+
+2. **Adapt for Specific Sports**
+   - Customize the algorithm based on the sport's requirements (e.g., different group sizes or constraints).
+   - Use the polynomial time approximation for practical scheduling.
+
+3. **Validate Results**
+   - Test the algorithm on various tournament instances to ensure it meets the guaranteed bounds.
+   - Adjust parameters as necessary to optimize scheduling for specific conditions.
