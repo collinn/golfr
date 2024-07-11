@@ -1,3 +1,5 @@
+# geneticSolver #
+
 *const GENERATIONS = 30*
 *const RANDOM_MUTATIONS = 2*
 *const MAX_DESCENDANTS_TO_EXPLORE = 100**
@@ -170,12 +172,163 @@ It updates the weights and reports progress after each round.
     *}*
   *}*
 *}*
+
 A utility function that iterates over all unique pairs in an array and applies a callback to each pair.
 
-These series of code implement a genetic algorithm to solve the social golfer problem,
+`geneticSolver` implements a genetic algorithm to solve the social golfer problem,
 which involves organizing players into groups over multiple rounds such that
 certain constraints are satisfied, and pairs are grouped together as few times as possible.
 The algorithm uses permutations, mutations, and weights to explore possible configurations,
 aiming to minimize the total cost of grouping players while respecting forbidden and discouraged pairs.
 The process is iterative, running over a specified number of generations and rounds,
 updating weights based on grouping history, and reporting progress through a callback function.
+
+# seatingChart #
+
+*const _ = require('lodash')*
+*const {Record, List, Set, Stack} = require('immutable')*
+
+Imports the `lodash` library and several classes from the `immutable` library,
+which provides immutable data structures.
+
+*const State = Record({*
+  *finishedRounds: List(),*
+  *groups: List(),*
+  *nextPlayer: 0,*
+  *totalCost: 0,*
+  *weights: null,*
+*})*
+
+Defines a `State` record using `immutable`'s `Record`.
+It has properties `finishedRounds`, `groups`, `nextPlayer`, `totalCost`, and
+`weights` initialized with default values.
+
+*function printState(state) {*
+  *return JSON.stringify(state.groups.toJS()) + ', cost ' + state.totalCost*
+*}*
+
+Converts the `groups` property of a state to a plain JavaScript object and
+returns a string representation of the state, including its `totalCost`.
+
+*function printWeights(weights) {*
+  *return weights.toJS().map(row => row.join('  ')).join('\n')*
+*}*
+
+Converts the `weights` matrix to a plain JavaScript object and returns a string
+representation with each row joined by spaces.
+
+*module.exports = function seatingChart({*
+  *studentNames,*
+  *totalGroups,*
+  *seatsPerGroup,*
+  *rounds,*
+*}) {*
+
+Exports a function `seatingChart` that takes an object with properties:
+`studentNames`, `totalGroups`, `seatsPerGroup`, and `rounds`.
+
+  *const playerCount = studentNames.length*
+
+Calculates the number of students from the length of `studentNames`.
+
+  *function exploreState(state) {*
+    *const {weights, nextPlayer} = state;*
+    *if (nextPlayer >= playerCount) {*
+      *return [*
+        *state.merge({*
+          *finishedRounds: state.finishedRounds.push(state),*
+          *groups: List(),*
+          *nextPlayer: 0,*
+        *})*
+      *]*
+    *}*
+
+The `exploreState` function generates new states by attempting to place the 
+next player into existing or new groups.
+If all players are seated, it finalizes the round and resets the `groups` and `nextPlayer`.
+
+  *const childStates = []*
+    *for (let i = 0; i < state.groups.size; i++) {*
+      *const group = state.groups.get(i)*
+      *if (group.size < seatsPerGroup) {*
+        *const cost = group.reduce((cost, player) => {*
+          *return cost + weights.getIn([player, nextPlayer])*
+        *}, 0)*
+        *let newWeights = state.weights*
+        *group.forEach(member => {*
+          *newWeights = newWeights*
+            *.setIn([nextPlayer, member], 1)*
+            *.setIn([member, nextPlayer], 1)*
+        *})*
+        *childStates.push(state.merge({*
+          *groups: state.groups.set(i, group.add(nextPlayer)),*
+          *nextPlayer: nextPlayer + 1,*
+          *totalCost: state.totalCost + cost,*
+          *weights: newWeights*
+        *}))*
+      *}*
+    *}*
+
+Iterates over existing groups and tries to place the next player into each group,
+updating the total cost and weights accordingly.
+
+  *if (state.groups.size < totalGroups) {*
+    *childStates.push(state.merge({*
+        *groups: state.groups.push(Set.of(state.nextPlayer)),*
+        *nextPlayer: state.nextPlayer + 1,*
+        *weights: weights*
+      *}))*
+    *}*
+    
+If there are available groups, adds a new group with the next player.
+
+  *return childStates*
+  *}*
+
+Returns the list of new child states generated from the current state.
+
+  *const initialState = new State({*
+    *weights: List(_.range(playerCount).map(() => List(_.range(playerCount).fill(0))))*
+  *})*
+  *let unexploredStates = Stack()*
+
+Initializes the `initialState` with a weights matrix filled with zeros and
+creates an empty `Stack` for unexplored states.
+
+  *let currentState = initialState;*
+  *do {*
+    *unexploredStates = unexploredStates.unshiftAll(exploreState(currentState))*
+    *unexploredStates = unexploredStates.sort((a, b) => a.totalCost > b.totalCost ? 1 : a.totalCost === b.totalCost ? 0 : -1)*
+    *currentState = unexploredStates.first()*
+    *unexploredStates = unexploredStates.shift()*
+  *} while (currentState.finishedRounds.size < rounds)*
+
+The main loop that explores states until the required number of rounds is reached.
+It adds new states to the stack, sorts them by total cost, and selects the best state to explore next.
+
+  *currentState.finishedRounds.forEach(round => {*
+    *console.log(printState(round));*
+  *})*
+  *console.log(printWeights(currentState.weights))*
+
+Prints the final state of each round and the weights matrix.
+
+  *return {*
+    *conflicts: currentState.totalCost,*
+    *rounds: [*
+      *currentState.groups.toJS().map(group => group.map(playerIndex => studentNames[playerIndex]))*
+    *]*
+  *}*
+*}*
+
+Returns an object containing the total conflicts (cost) and the final seating chart with student names.
+
+`seatingChart` solves the seating chart problem using a search algorithm that explores
+possible seating configurations.
+It initializes with a given number of groups, seats per group, and rounds, and
+iteratively generates new states by placing students into groups.
+The goal is to minimize the total cost, calculated based on a weights matrix that
+tracks conflicts (students seated together previously).
+The algorithm explores states until the desired number of rounds is completed,
+selecting the best configurations based on the total cost.
+The final result includes the total number of conflicts and the seating chart for each round.
