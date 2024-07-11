@@ -21,5 +21,16 @@ to separate .R in `functions` file
 - `groupassign` now returns the data frame with lists (saved after each iteration) as final output
 - `MakeGroups` is supposed to return all the data frames combined after each round (Issue \# 2)
 
-## June 24-26, Week 5
-- 
+## June 24-28, Week 5
+- Advanced R Chapter 2 Exercise
+- Package Skeleton building in progress
+
+## July 1-5, Week 6
+- `MakeGroups` correction; overlap exists
+- Introduction for the draft paper written
+- Documentation for `GenerateData`, `initmat`, `Makegroups`, and `updatemat` written
+
+## July 8-12, Week 7
+- Advanced R Chapter 6&7 Exercise
+- Analyzed two papers about Social Golfer Problem (SGP); how the authors approached to solve it
+- Interpret `good-enough-golfers.js` into detailed English description (2/3)
