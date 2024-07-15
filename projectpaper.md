@@ -68,15 +68,43 @@ enhances the overall educational experience.
 
 # Conclusion
 
+This research addresses the complex issue of managing student group assignments
+in educational settings by developing an R package that automates the iterative
+assignment of students into groups.
+By leveraging the principles of social golfer problem, we aimed to create a tool
+that simplifies the group assignment process, thus enhancing collaboration, 
+critical thinking, and peer learning among students.
 
+Despite the promising outcomes, there are several limitations and constraints
+inherent to solving the social golfer problem, which also affect our approach.
+Firstly, the problem's combinatorial nature makes it computationally intensive,
+particularly as the number of students and the number of iterations increase.
+This complexity can lead to significant processing times and may require high computational resources,
+which could limit the tool's applicability in larger classes or more extensive iterations. 
+Moreover, the solution's optimality is not guaranteed in all scenarios;
+certain configurations may still result in some repetition of group members,
+particularly when the number of students or the group sizes do not neatly fit the required criteria.
 
+Another constraint is the potential lack of scalability and flexibility in
+dealing with various educational contexts and settings.
+While our tool is designed to be robust and adaptable, it may face challenges
+when applied to courses with highly diverse or specialized requirements.
+For instance, classes with students who have vastly different skill levels, interests,
+or learning objectives may require more sophisticated algorithms to ensure balanced
+and effective group assignments.
+Additionally, certain courses may necessitate frequent reconfiguration of groups
+based on ongoing assessments or evolving class dynamics, which could be challenging
+to implement efficiently within the current framework.
 
-
-
-
-
-
-
+Future research could focus on enhancing the flexibility and adaptability of the
+group assignment tool.
+One potential direction is the incorporation of machine learning algorithms that
+learn from past group assignments to predict and optimize future group configurations.
+Additionally, integrating real-time feedback mechanisms could allow the tool to
+adjust group assignments dynamically based on student performance and interactions.
+Exploring hybrid approaches that combine automated group assignments with manual
+adjustments made by instructors could also provide a balanced solution, improving
+computational efficiency while maintaining human oversight.
 
 # References
 [1] Wikimedia Foundation. (2024, January 30). Social golfer problem. Wikipedia. https://en.wikipedia.org/wiki/Social_golfer_problem 
