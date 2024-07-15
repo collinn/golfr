@@ -38,3 +38,4 @@ to separate .R in `functions` file
 ## July 15-20, Week 8
 - Interpret `good-enough-golfers.js` into detailed English description (3/3)
 - Interpret hexaly-social golfer into python code into detailed English description
+- Conclusion for the draft paper written
