@@ -34,3 +34,7 @@ to separate .R in `functions` file
 - Advanced R Chapter 6&7 Exercise
 - Analyzed two papers about Social Golfer Problem (SGP); how the authors approached to solve it
 - Interpret `good-enough-golfers.js` into detailed English description (2/3)
+
+## July 15-20, Week 8
+- Interpret `good-enough-golfers.js` into detailed English description (3/3)
+- Interpret hexaly-social golfer into python code into detailed English description
