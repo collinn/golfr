@@ -39,3 +39,4 @@ to separate .R in `functions` file
 - Interpret `good-enough-golfers.js` into detailed English description (3/3)
 - Interpret hexaly-social golfer into python code into detailed English description
 - Conclusion for the draft paper written
+- Pseudocode for `good enough golfers` java script made
