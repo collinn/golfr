@@ -1,0 +1,177 @@
+# Pseudocode for `geneticSolver` #
+
+1. **Define Constants**
+  - Define constants for the number of generations, random mutations,
+   and maximum descendants to explore.
+
+   ```
+   DEFINE Generations = 30
+   DEFINE Random_mutations = 2
+   DEFINE MAX_descendants = 100
+   ```
+
+2. **Function Definition**
+  - Define a function `geneticSolver` with parameters:
+     - Number of groups per round (`groups`)
+     - Number of players per group (`ofSize`)
+     - Number of rounds to compute (`forRounds`)
+     - Whether to use group leaders (`withGroupLeaders`)
+     - List of forbidden pairs of players (`forbiddenPairs`)
+     - List of discouraged groups of players (`discouragedGroups`)
+     - A callback function to report progress (`onProgress`)
+     
+   ```
+   ARGUMENTS: groups, ofSize, forRounds, withGroupLeaders, forbiddenPairs,
+   discouragedGroups, onProgress
+   ```
+
+3. **Initialize Variables**
+  - Calculate the total number of players (`totalSize`).
+   - Initialize the weights matrix with zeroes for all player pairs.
+   - Apply initial restrictions to the weights matrix based on the forbidden pairs
+     and discouraged groups.
+
+   ```
+   CALCULATE totalSize = groups * ofSize
+   INITIALIZE weights = a matrix of size totalSize * totalSize with all zeroes
+   ```
+
+4. **Define Helper Functions**
+  - `score` function: Calculate the cost of a given round configuration based 
+    on the weights matrix.
+   
+     ```
+     FUNCTION score(round, weights)
+       INITIALIZE groupScores AS an empty list
+       FOR EACH group IN round
+         INITIALIZE groupCost = 0
+         FOR EACH pair (a, b) IN group
+           ADD weights[a][b]^2 TO groupCost
+         ADD groupCost TO groupScores
+       CALCULATE total AS the sum of groupScores
+       RETURN an object with groups, groupScores, and total
+     ```
+
+  - `generatePermutation` function: Create a shuffled configuration of players 
+    into groups, with special handling for group leaders if specified.
+   
+     ```
+     FUNCTION generatePermutation()
+       IF withGroupLeaders IS TRUE
+         SET shuffleStart = groups
+       ELSE
+         SET shuffleStart = 0
+       SHUFFLE players from shuffleStart to totalSize
+       DIVIDE shuffled players into groups
+       RETURN the groups
+     ```
+
+  - `generateMutations` function: Generate new candidate configurations by
+      mutating the provided candidates, including swapping players and adding
+      random permutations.
+   
+     ```
+     FUNCTION generateMutations(candidates, weights)
+       INITIALIZE mutations AS an empty list
+       FOR EACH candidate IN candidates
+         SORT groups IN candidate BY score in descending order
+         ADD candidate TO mutations
+         FOR EACH player i IN the most expensive group
+           IF withGroupLeaders AND i == 0, CONTINUE
+           FOR EACH player j FROM ofSize TO totalSize
+             IF withGroupLeaders AND j % ofSize == 0, CONTINUE
+             SWAP player i AND player j
+             ADD the new configuration TO mutations
+         ADD RANDOM_MUTATIONS random permutations TO mutations
+       RETURN mutations
+     ```
+
+  - `swap` function: Swap two players in the groups configuration.
+  
+     ```
+     FUNCTION swap(groups, i, j)
+       COPY groups
+       SWAP player i AND player j IN the copy
+       RETURN the modified copy
+     ```
+
+  - `updateWeights` function: Update the weights matrix based on the provided round configuration.
+  
+     ```
+     FUNCTION updateWeights(round, weights)
+       FOR EACH group IN round
+         FOR EACH pair (a, b) IN group
+           INCREMENT weights[a][b] AND weights[b][a] BY 1
+     ```
+
+  - `forEachPair` function: Iterate over all unique pairs in an array and
+    apply a callback function to each pair.
+    
+     ```
+     FUNCTION forEachPair(array, callback)
+       FOR i FROM 0 TO length of array - 1
+         FOR j FROM i + 1 TO length of array
+           CALL callback(array[i], array[j])
+     ```
+
+5. **Initialize Weights Matrix**
+  - If group leaders are used, forbid every pairwise combination of group leaders.
+   - Apply forbidden pairs and discouraged groups to the weights matrix.
+   
+   ```
+   IF withGroupLeaders IS TRUE
+     FOR EACH pair (i, j) of group leaders
+       SET weights[i][j] AND weights[j][i] TO Infinity
+
+   FOR EACH group IN forbiddenPairs
+     FOR EACH pair (a, b) IN group
+       IF a >= totalSize OR b >= totalSize, CONTINUE
+       SET weights[a][b] AND weights[b][a] TO Infinity
+
+   FOR EACH group IN discouragedGroups
+     FOR EACH pair (a, b) IN group
+       IF a >= totalSize OR b >= totalSize, CONTINUE
+       INCREMENT weights[a][b] AND weights[b][a] BY 1
+   ```
+
+6. **Main Algorithm Loop**
+  - Initialize lists to keep track of rounds and their scores.
+   - For each round:
+     - Generate initial permutations.
+     - Mutate and evaluate the permutations over a specified number of generations.
+     - Select the best candidate configurations based on their scores.
+     - Update the weights matrix based on the best configuration.
+     - Report progress using the callback function.
+     
+   ```
+   INITIALIZE rounds AS an empty list
+   INITIALIZE roundScores AS an empty list
+
+   FOR round FROM 0 TO forRounds - 1
+     GENERATE initial permutations AS topOptions
+     SET generation = 0
+     WHILE generation < GENERATIONS AND topOptions[0].total > 0
+       GENERATE mutations FROM topOptions
+       SORT mutations BY total score
+       SET bestScore AS the score of the best mutation
+       REDUCE topOptions TO the best mutations with score == bestScore
+       SHUFFLE AND SLICE topOptions TO MAX_DESCENDANTS_TO_EXPLORE
+       INCREMENT generation
+
+     SET bestOption AS the best mutation
+     IF withGroupLeaders IS TRUE
+       SORT bestOption.groups TO keep leaders in order
+     ADD bestOption.groups TO rounds
+     ADD bestOption.total TO roundScores
+     UPDATE weights WITH bestOption.groups
+
+     CALL onProgress WITH rounds, roundScores, weights, and done flag
+  ```
+  
+  7. **Return Results**
+   - After completing all rounds, return the final configuration and the total cost.
+  
+  ```
+   RETURN the final rounds and total cost
+   ```
+   
