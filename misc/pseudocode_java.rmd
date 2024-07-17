@@ -57,7 +57,7 @@
    
      ```
      FUNCTION generatePermutation()
-       IF withGroupLeaders IS TRUE
+       IF withGroupLeaders = TRUE,
          SET shuffleStart = groups
        ELSE
          SET shuffleStart = 0
