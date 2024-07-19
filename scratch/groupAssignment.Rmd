@@ -77,3 +77,92 @@ updated_matrix
 # groupassign function moved to separate .R file
 ```
 
+```{r warning = F}
+library(dplyr)
+
+# Function to update group assignment to weight matrix
+
+updatemat <- function(file_path, round) {
+  
+    data <- read.csv(file_path, stringsAsFactors = FALSE)
+  
+  # Extract student names
+  students <- data[[1]]
+  
+  # Initialize the weight matrix
+  n <- length(students)
+  weight_matrix <- matrix(0, nrow = n, ncol = n)
+  colnames(weight_matrix) <- students
+  rownames(weight_matrix) <- students
+  
+  # Set diagonal elements to -99
+  diag(weight_matrix) <- -99
+  
+  # Get group assignments for round 1
+  round_col <- data[[round + 1]] 
+  
+  # Update the weight matrix based on round 1 group assignments
+  for (group in unique(round1_groups)) {
+    group_members <- which(round_col == group)
+    for (i in group_members) {
+      for (j in group_members) {
+        if (i != j) {
+          weight_matrix[i, j] <- 1
+        }
+      }
+    }
+  }
+  
+  return(weight_matrix)
+}
+
+# Example usage
+file_path <- "C:/Users/hanna/Downloads/golfer_solution.csv"
+round <- 5
+weight_matrix <- updatemat(file_path, round)
+
+```
+
+```{r}
+# Function to calculate conflict scores
+conflict <- function(round, weights) {
+  # Helper function to iterate over all unique pairs within a group
+  forEachPair <- function(group, func) {
+    n <- length(group)
+    for (i in 1:(n-1)) {
+      for (j in (i+1):n) {
+        func(group[i], group[j])
+      }
+    }
+  }
+  
+  # Initialize group scores
+  groupScores <- vector("list", length(round))
+  
+  # Calculate the group conflict score
+  for (g in seq_along(round)) {
+    group <- round[[g]]
+    groupCost <- 0
+    forEachPair(group, function(a, b) {
+      groupCost <- groupCost + weights[a, b]^2
+    })
+    groupScores[[g]] <- groupCost
+  }
+  
+  # Calculate the total conflict score
+  totalConflictScore <- sum(unlist(groupScores))
+  
+  # Return the result
+  result <- list(
+    groups = round,
+    groupScores = groupScores,
+    total = totalConflictScore
+  )
+  
+  return(result)
+}
+
+conflict_score <- conflict(round, weight_matrix)
+print(conflict_score)
+```
+
