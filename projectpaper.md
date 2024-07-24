@@ -6,6 +6,7 @@ output: pdf_document
 ---
 
 # Introduction
+## Objective
 
 The effective management of student group assignments is a critical component of
 contemporary educational practice, particularly in courses where collaboration
@@ -15,6 +16,8 @@ iterative assignment of students into groups, with specific emphasis on optimizi
 group dynamics and ensuring fair participation.
 Our primary research objective is to create a tool that simplifies and streamlines
 the process of forming student groups.
+
+## Motivation
 
 The motivation for this project stems from the observation that many faculty
 members find it easier to teach class material and facilitate student learning
@@ -26,6 +29,7 @@ and inefficient, particularly as class sizes increase.
 An automated solution not only saves time but also ensures that groups are formed
 systematically, considering various constraints and preferences.
 
+## Social Golfer Problem (SGP)
 The program is closely related to the social golfer problem, a well-known combinatorial
 problem in mathematics and computer science. [1]
 The social golfer problem asks how a given number of golfers can be arranged into
@@ -35,7 +39,22 @@ Solving this problem presents significant challenges due to the complexity of
 ensuring that all constraints are met while optimizing for minimal repetition of 
 groupings. 
 
-Our project draws inspiration from this problem, aiming to develop a practical tool
+## Previous Researches
+
+We wrote the pseudocode based on `good-enough-golfers` by Buchanan, B (2017), 
+a java script program designed to nearly solve the social golfer problem, 
+specifically one of the main functions called `genericsolver`.
+While writing, we faced several challenges, especially since it was our first attempt.
+Translating our understanding into clear, step-by-step pseudocode was difficult. 
+We found it challenging to abstract the code's logic into plain language, 
+especially when some of us do not have any previous experience or knowledge in java script.
+Striking the right balance between detail and simplicity was also tricky; 
+too much detail risked overcomplicating the pseudocode, while too little could make it vague. 
+If we had another opportunity, we would focus more on breaking down complex sections into smaller, 
+more manageable parts before converting it to more detailed pseudocode.
+This approach would help us ensure that each step is comprehensible and logically connected.
+
+Our project draws inspiration from the same problem, aiming to develop a practical tool
 that can be used by educators to manage student group assignments effectively.
 By leveraging the principles underlying the social golfer problem, we seek to create
 a robust and flexible package that accommodates various grouping requirements and
