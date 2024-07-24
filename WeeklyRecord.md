@@ -40,3 +40,8 @@ to separate .R in `functions` file
 - Interpret hexaly-social golfer into python code into detailed English description
 - Conclusion for the draft paper written
 - Pseudocode for `good enough golfers` java script made
+
+## July 23-27, Week 9
+- A set of functions to regenerate `good-enough-golfers.js` conflict scores made
+- Functions edited
+- Wrote a paragraph to reflect on the experience of writing pseudocode
