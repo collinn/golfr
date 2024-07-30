@@ -35,13 +35,16 @@ to separate .R in `functions` file
 - Analyzed two papers about Social Golfer Problem (SGP); how the authors approached to solve it
 - Interpret `good-enough-golfers.js` into detailed English description (2/3)
 
-## July 15-20, Week 8
+## July 15-19, Week 8
 - Interpret `good-enough-golfers.js` into detailed English description (3/3)
 - Interpret hexaly-social golfer into python code into detailed English description
 - Conclusion for the draft paper written
 - Pseudocode for `good enough golfers` java script made
 
-## July 23-27, Week 9
+## July 22-26, Week 9
 - A set of functions to regenerate `good-enough-golfers.js` conflict scores made
 - Functions edited
 - Wrote a paragraph to reflect on the experience of writing pseudocode
+
+## July 29-August 2, Week 10
+- Added a set of functions to update group assignments to weight matrix and calculate conflict scores
