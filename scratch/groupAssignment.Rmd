@@ -82,8 +82,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r warning = F}
 library(dplyr)
 
-# Function to update group assignment to weight matrix
-updatemat <- function(file_path, rounds) {
+updatemat <- function(file_path) {
   # Load required library
   library(dplyr)
   
@@ -100,29 +99,26 @@ updatemat <- function(file_path, rounds) {
   # Set diagonal to -99
   diag(weight_matrix) <- -99
   
-  # Extract the specified round of group assignments
-  round_col <- data[[round + 1]] # Adjust for the correct column index
-  
-  # Update the weight matrix based on the group assignments
-  for (group in unique(round_col)) {
-    group_members <- which(round_col == group)
-    for (i in 1:length(group_members)) {
-      for (j in (i + 1):length(group_members)) {
-        weight_matrix[group_members[i], group_members[j]] <- weight_matrix[group_members[i], group_members[j]] + 1
-        weight_matrix[group_members[j], group_members[i]] <- weight_matrix[group_members[j], group_members[i]] + 1
+  # Loop through each round and update the weight matrix
+  for (round in 2:ncol(data)) { # Start from the second column to the last column
+    round_col <- data[[round]]
+    
+    for (group in unique(round_col)) {
+      group_members <- which(round_col == group)
+      for (i in 1:length(group_members)) {
+        for (j in (i + 1):length(group_members)) {
+          weight_matrix[group_members[i], group_members[j]] <- weight_matrix[group_members[i], group_members[j]] + 1
+          weight_matrix[group_members[j], group_members[i]] <- weight_matrix[group_members[j], group_members[i]] + 1
+        }
       }
     }
   }
   
-  # Ensure the diagonal remains -99
-  diag(weight_matrix) <- -99
-  
   return(weight_matrix)
 }
 
-file_path <- "C:/Users/hanna/Downloads/golfer_solution.csv"
-rounds <- 1:5
-weight_matrix <- updatemat(file_path, rounds)
+file_path <- "C:/Users/hanna/Downloads/golfer_solution (2).csv"
+weight_matrix <- updatemat(file_path)
 
 ```
 
@@ -132,7 +128,7 @@ conflict <- function(weight_matrix) {
   n <- nrow(weight_matrix)
   conflict_score <- 0
   
-  # Calculate conflict score
+  # Calculate conflict score based on squared counts
   for (i in 1:(n - 1)) {
     for (j in (i + 1):n) {
       if (weight_matrix[i, j] > 0) {
@@ -151,22 +147,58 @@ print(conflictscore)
 
 ```{r}
 # Final function: updatemat + conflict
-conflict_per_round <- function(file_path, rounds) {
-  # Initialize a vector to store conflict scores for each round
-  conflict_scores <- numeric(length(rounds))
+conflict_per_round <- function(file_path) {
   
-  # Calculate conflict score for each round
-  for (i in seq_along(rounds)) {
-    round <- rounds[i]
-    weight_matrix <- weight_matrix + updatemat(file_p ath, round)
-    conflict_scores[i] <- conflict(weight_matrix)
+  # Read the CSV file
+  data <- read.csv(file_path, stringsAsFactors = FALSE)
+  
+  # Extract student names
+  students <- data[[1]]
+  
+  # Initialize the weight matrix
+  n <- length(students)
+  weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
+  
+  # Set diagonal to -99
+  diag(weight_matrix) <- -99
+  
+  # Initialize a vector to store conflict scores for each round
+  conflict_scores <- numeric(ncol(data) - 1)
+  
+  # Loop through each round, update the weight matrix, and calculate the conflict score
+  for (round in 2:ncol(data)) { # Start from the second column to the last column
+    round_col <- data[[round]]
+    
+    for (group in unique(round_col)) {
+      group_members <- which(round_col == group)
+      for (i in 1:length(group_members)) {
+        for (j in (i + 1):length(group_members)) {
+          weight_matrix[group_members[i], group_members[j]] <- weight_matrix[group_members[i], group_members[j]] + 1
+          weight_matrix[group_members[j], group_members[i]] <- weight_matrix[group_members[j], group_members[i]] + 1
+        }
+      }
+    }
+    
+    # Calculate the conflict score for the current state of the weight matrix
+    conflict_scores[round - 1] <- conflict(weight_matrix)
   }
   
   return(conflict_scores)
 }
 
-scores <- conflict_per_round(file_path, rounds)
+scores <- conflict_per_round(file_path)
 print(scores)
 
 ```
 
+```{r}
+# students <- LETTERS[1:8]
+# n <- length(students)
+# weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
+# 
+# diag(weight_matrix) <- -99
+gp2 <- c("A", "B", "C", "F")
+cs <- weight_matrix[gp2, gp2][upper.tri(weight_matrix[gp2, gp2])]
+
+sum(cs^2)
+```
