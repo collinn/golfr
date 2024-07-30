@@ -1,0 +1,29 @@
+
+
+## Solution with link to github
+https://goodenoughgolfers.com/
+
+## Another solution in various languages
+https://www.hexaly.com/docs/last/exampletour/socialgolfer.html
+
+## Overview of SGP
+https://www.metalevel.at/sgp/
+https://www.metalevel.at/mst.pdf # <- solution
+https://link.springer.com/article/10.1007/s10479-011-0866-7 # <- publication of above solution 
+
+## Relevant Wikipedia for later
+https://en.wikipedia.org/wiki/Social_golfer_problem
+https://en.wikipedia.org/wiki/Greedy_algorithm
+https://en.wikipedia.org/wiki/Multi-objective_optimization
+
+
+## With additional constraints
+https://math.stackexchange.com/questions/4746720/social-golfer-problem-with-additional-requirement
+
+## Random papers (haven't read)
+https://www.sciencedirect.com/science/article/pii/S0377221721007773#fig0005
+
+## CRAN walkthrough
+https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/
+https://kbroman.org/pkg_primer/pages/cran.html
+https://www.r-bloggers.com/2016/07/submitting-your-first-package-to-cran-my-experience/

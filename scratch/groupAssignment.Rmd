@@ -107,6 +107,7 @@ updatemat <- function(file_path) {
       group_members <- which(round_col == group)
       for (i in 1:length(group_members)) {
         for (j in (i + 1):length(group_members)) {
+          if (i == j) next
           weight_matrix[group_members[i], group_members[j]] <- weight_matrix[group_members[i], group_members[j]] + 1
           weight_matrix[group_members[j], group_members[i]] <- weight_matrix[group_members[j], group_members[i]] + 1
         }
@@ -118,6 +119,7 @@ updatemat <- function(file_path) {
 }
 
 file_path <- "C:/Users/hanna/Downloads/golfer_solution (2).csv"
+file_path <- "../data/golfer_solution (2).csv"
 weight_matrix <- updatemat(file_path)
 
 ```
@@ -128,14 +130,19 @@ conflict <- function(weight_matrix) {
   n <- nrow(weight_matrix)
   conflict_score <- 0
   
-  # Calculate conflict score based on squared counts
-  for (i in 1:(n - 1)) {
-    for (j in (i + 1):n) {
-      if (weight_matrix[i, j] > 0) {
-        conflict_score <- conflict_score + (weight_matrix[i, j])^2
-      }
-    }
-  }
+  # # Calculate conflict score based on squared counts
+  # for (i in 1:(n - 1)) {
+  #   for (j in (i + 1):n) {
+  #     if (weight_matrix[i, j] > 0) {
+  #       conflict_score <- conflict_score + (weight_matrix[i, j]-1)^2
+  #     }
+  #   }
+  # }
+  
+  ## Get upper tri entries
+  ww <- weight_matrix[upper.tri(weight_matrix)]
+  ww <- ww[ww > 0] # keep only positive entries
+  conflict_score <- sum((ww-1)^2)
   
   return(conflict_score)
 }
@@ -165,29 +172,47 @@ conflict_per_round <- function(file_path) {
   # Initialize a vector to store conflict scores for each round
   conflict_scores <- numeric(ncol(data) - 1)
   
+  weight_list <- vector("list", length = ncol(data)-1)
+  
   # Loop through each round, update the weight matrix, and calculate the conflict score
-  for (round in 2:ncol(data)) { # Start from the second column to the last column
-    round_col <- data[[round]]
+  for (round in 1:(ncol(data)-1)) { # Start from the second column to the last column
+    round_col <- data[[round+1]]
+    
+    ## within each round, create new weight matrix
+    weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
+    # Set diagonal to -99
+    diag(weight_matrix) <- -99
+    
     
     for (group in unique(round_col)) {
+      
       group_members <- which(round_col == group)
       for (i in 1:length(group_members)) {
         for (j in (i + 1):length(group_members)) {
+          if (i == j) next
           weight_matrix[group_members[i], group_members[j]] <- weight_matrix[group_members[i], group_members[j]] + 1
           weight_matrix[group_members[j], group_members[i]] <- weight_matrix[group_members[j], group_members[i]] + 1
         }
       }
     }
     
+    weight_list[[round]] <- weight_matrix
+    
     # Calculate the conflict score for the current state of the weight matrix
-    conflict_scores[round - 1] <- conflict(weight_matrix)
+    #conflict_scores[round - 1] <- conflict(weight_matrix)
   }
   
-  return(conflict_scores)
+  return(weight_list)
+  
+  #return(conflict_scores)
 }
 
 scores <- conflict_per_round(file_path)
 print(scores)
+
+cw <- Reduce(`+`, scores, accumulate = TRUE)
+
+cs <- lapply(cw, conflict)
 
 ```
 
@@ -202,3 +227,51 @@ cs <- weight_matrix[gp2, gp2][upper.tri(weight_matrix[gp2, gp2])]
 
 sum(cs^2)
 ```
+
+
+```{r}
+scores <- conflict_per_round(file_path)
+print(scores)
+
+cw <- Reduce(`+`, scores, accumulate = TRUE)
+
+## Round 5 and round 4
+cw5 <- cw[[4]] # (cw = cumulative weight matrix)
+cw4 <- cw[[3]]
+
+## Subtracting shows me which people were paired in round 5
+cw5-cw4 # every entry with "1" was paired in round 5
+
+weight5 <- cw5-cw4 # difference from above
+
+## This is same as weight matrix for round 5!
+identical(weight5, scores[[4]])
+
+madePair <- weight5[upper.tri(weight5)] # index of pairs made
+
+## Scores from round 4
+scores_from_four <- cw4[upper.tri(cw4)]
+
+
+## use 0/1 as logical to subset correct ones!
+sum(scores_from_four[as.logical(madePair)]^2)
+```
+
+
+```{r}
+f <- function(df) {
+  studnets <- df[[1]]
+  round_weights <- vector("list", n)
+  
+  for (i in rounds) {
+    round_weights[[i]] <- compute_round_weight(df[[i]])
+  }
+  return(round_weights)
+}
+
+f2 <- function(round_weights) {
+  # 1: compute cumulative weights using Reduce
+  # 2: use both of these to compute conflict scores
+}
+```
+
