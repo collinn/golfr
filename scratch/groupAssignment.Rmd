@@ -81,13 +81,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r warning = F}
 library(dplyr)
-
-updatemat <- function(file_path) {
-  # Load required library
-  library(dplyr)
+# Function to generate cumulative matrix (weight matrix)
+cummat <- function(df) {
   
-  # Read the CSV file
-  data <- read.csv(file_path, stringsAsFactors = FALSE)
+  data <- read.csv(df)
   
   # Extract student names
   students <- data[[1]]
@@ -118,46 +115,17 @@ updatemat <- function(file_path) {
   return(weight_matrix)
 }
 
-file_path <- "C:/Users/hanna/Downloads/golfer_solution (2).csv"
-file_path <- "../data/golfer_solution (2).csv"
-weight_matrix <- updatemat(file_path)
+data <- "../data/golfer_solution (2).csv"
+weight_matrix <- cummat(data)
 
 ```
 
-```{r}
-# Function to calculate conflict scores
-conflict <- function(weight_matrix) {
-  n <- nrow(weight_matrix)
-  conflict_score <- 0
-  
-  # # Calculate conflict score based on squared counts
-  # for (i in 1:(n - 1)) {
-  #   for (j in (i + 1):n) {
-  #     if (weight_matrix[i, j] > 0) {
-  #       conflict_score <- conflict_score + (weight_matrix[i, j]-1)^2
-  #     }
-  #   }
-  # }
-  
-  ## Get upper tri entries
-  ww <- weight_matrix[upper.tri(weight_matrix)]
-  ww <- ww[ww > 0] # keep only positive entries
-  conflict_score <- sum((ww-1)^2)
-  
-  return(conflict_score)
-}
-
-conflictscore <- conflict(weight_matrix)
-print(conflictscore)
-
-```
 
 ```{r}
-# Final function: updatemat + conflict
-conflict_per_round <- function(file_path) {
-  
-  # Read the CSV file
-  data <- read.csv(file_path, stringsAsFactors = FALSE)
+# Function to generate round matrix
+roundmat <- function(data) {
+
+  data <- read.csv(data)
   
   # Extract student names
   students <- data[[1]]
@@ -165,9 +133,6 @@ conflict_per_round <- function(file_path) {
   # Initialize the weight matrix
   n <- length(students)
   weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
-  
-  # Set diagonal to -99
-  diag(weight_matrix) <- -99
   
   # Initialize a vector to store conflict scores for each round
   conflict_scores <- numeric(ncol(data) - 1)
@@ -198,63 +163,64 @@ conflict_per_round <- function(file_path) {
     
     weight_list[[round]] <- weight_matrix
     
-    # Calculate the conflict score for the current state of the weight matrix
-    #conflict_scores[round - 1] <- conflict(weight_matrix)
   }
   
   return(weight_list)
-  
-  #return(conflict_scores)
-}
+  }
 
-scores <- conflict_per_round(file_path)
-print(scores)
-
-cw <- Reduce(`+`, scores, accumulate = TRUE)
-
-cs <- lapply(cw, conflict)
+weight_list <- roundmat(data)
+print(weight_list)
 
 ```
 
 ```{r}
-# students <- LETTERS[1:8]
-# n <- length(students)
-# weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
+# Function to calculate conflict scores
+# conflict <- function(weight_matrix) {
+#   n <- nrow(weight_matrix)
+#   conflict_score <- 0
+#   
+#   ## Get upper tri entries
+#   ww <- weight_matrix[upper.tri(weight_matrix)]
+#   ww <- ww[ww > 0] # keep only positive entries
+#   conflict_score <- sum((ww-1)^2)
+#   
+#   return(conflict_score)
+# }
 # 
-# diag(weight_matrix) <- -99
-gp2 <- c("A", "B", "C", "F")
-cs <- weight_matrix[gp2, gp2][upper.tri(weight_matrix[gp2, gp2])]
+# conflictscore <- conflict(weight_matrix)
+# print(conflictscore)
 
-sum(cs^2)
 ```
 
-
 ```{r}
-scores <- conflict_per_round(file_path)
-print(scores)
+Final <- function (weight_list){
+  wm <- Reduce(`+`, weight_list, accumulate = TRUE) # wm = cumulative weight matrix
 
-cw <- Reduce(`+`, scores, accumulate = TRUE)
+#cs <- lapply(cumulativemat, conflict)
 
 ## Round 5 and round 4
-cw5 <- cw[[4]] # (cw = cumulative weight matrix)
-cw4 <- cw[[3]]
+wm5 <- wm[[5]] # magic number
+wm4 <- wm[[4]] # magic number
 
-## Subtracting shows me which people were paired in round 5
-cw5-cw4 # every entry with "1" was paired in round 5
-
-weight5 <- cw5-cw4 # difference from above
+## Subtracting shows which people were paired in round 5
+weight5 <- wm5-wm4 # every entry with "1" was paired in round 5
 
 ## This is same as weight matrix for round 5!
-identical(weight5, scores[[4]])
+identical(weight5, weight_list[[4]])
 
 madePair <- weight5[upper.tri(weight5)] # index of pairs made
 
 ## Scores from round 4
-scores_from_four <- cw4[upper.tri(cw4)]
+scores_from_four <- wm4[upper.tri(wm4)]
 
 
 ## use 0/1 as logical to subset correct ones!
-sum(scores_from_four[as.logical(madePair)]^2)
+conflict_score <- sum(scores_from_four[as.logical(madePair)]^2)
+
+return(conflict_score)
+}
+
+Final(weight_list)
 ```
 
 
