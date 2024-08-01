@@ -137,31 +137,25 @@ cummat <- Reduce(`+`, weight_list, accumulate = TRUE)
 
 ```{r}
 # Function to calculate conflict score
-Final <- function (weight_list){
-  wm <- Reduce(`+`, weight_list, accumulate = TRUE) # wm = cumulative weight matrix
-
-#cs <- lapply(cumulativemat, conflict)
-
-## Round 5 and round 4
-wm5 <- wm[[2]] # magic number
-wm4 <- wm[[1]] # magic number
-
-## Subtracting shows which people were paired in round 5
-weight5 <- wm5-wm4 # every entry with "1" was paired in round 5
-
-## This is same as weight matrix for round 5!
-identical(weight5, weight_list[[4]])
-
-madePair <- weight5[upper.tri(weight5)] # index of pairs made
-
-## Scores from round 4
-scores_from_four <- wm4[upper.tri(wm4)]
-
-
-## use 0/1 as logical to subset correct ones!
-conflict_score <- sum(scores_from_four[as.logical(madePair)]^2)
-
-return(conflict_score)
+Final <- function(weight_list) {
+  n <- nrow(weight_list[[1]])
+  initial_matrix <- matrix(0, nrow = n, ncol = n)
+  diag(initial_matrix) <- -99
+  
+  cumulative_matrices <- list(initial_matrix)
+  conflict_scores <- numeric(length(weight_list))
+  
+  for (round in seq_along(weight_list)) {
+    cumulative_matrix <- cumulative_matrices[[round]] + weight_list[[round]]
+    cumulative_matrices[[round + 1]] <- cumulative_matrix
+    
+    madePair <- weight_list[[round]][upper.tri(weight_list[[round]])]
+    scores_from_previous <- cumulative_matrices[[round]][upper.tri(cumulative_matrices[[round]])]
+    
+    conflict_scores[round] <- sum(scores_from_previous[as.logical(madePair)]^2)
+  }
+  
+  return(conflict_scores)
 }
 
 Final(weight_list)
