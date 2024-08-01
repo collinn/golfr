@@ -79,69 +79,27 @@ knitr::opts_chunk$set(echo = TRUE)
 # groupassign function moved to separate .R file
 ```
 
-```{r warning = F}
+```{r message = F}
 library(dplyr)
-# Function to generate cumulative matrix (weight matrix)
-cummat <- function(df) {
-  
-  data <- read.csv(df)
-  
-  # Extract student names
-  students <- data[[1]]
-  
-  # Initialize the weight matrix
-  n <- length(students)
-  weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
-  
-  # Set diagonal to -99
-  diag(weight_matrix) <- -99
-  
-  # Loop through each round and update the weight matrix
-  for (round in 2:ncol(data)) { # Start from the second column to the last column
-    round_col <- data[[round]]
-    
-    for (group in unique(round_col)) {
-      group_members <- which(round_col == group)
-      for (i in 1:length(group_members)) {
-        for (j in (i + 1):length(group_members)) {
-          if (i == j) next
-          weight_matrix[group_members[i], group_members[j]] <- weight_matrix[group_members[i], group_members[j]] + 1
-          weight_matrix[group_members[j], group_members[i]] <- weight_matrix[group_members[j], group_members[i]] + 1
-        }
-      }
-    }
-  }
-  
-  return(weight_matrix)
-}
 
-data <- "../data/golfer_solution (2).csv"
-weight_matrix <- cummat(data)
-
-```
-
-
-```{r}
 # Function to generate round matrix
-roundmat <- function(data) {
-
-  data <- read.csv(data)
+roundmat <- function(df) {
   
   # Extract student names
-  students <- data[[1]]
+  students <- df[[1]]
   
   # Initialize the weight matrix
   n <- length(students)
   weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
   
   # Initialize a vector to store conflict scores for each round
-  conflict_scores <- numeric(ncol(data) - 1)
+  conflict_scores <- numeric(ncol(df) - 1)
   
-  weight_list <- vector("list", length = ncol(data)-1)
+  weight_list <- vector("list", length = ncol(df)-1)
   
   # Loop through each round, update the weight matrix, and calculate the conflict score
-  for (round in 1:(ncol(data)-1)) { # Start from the second column to the last column
-    round_col <- data[[round+1]]
+  for (round in 1:(ncol(df)-1)) { # Start from the second column to the last column
+    round_col <- df[[round+1]]
     
     ## within each round, create new weight matrix
     weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
@@ -168,39 +126,25 @@ roundmat <- function(data) {
   return(weight_list)
   }
 
-weight_list <- roundmat(data)
+df <- read.csv("../data/golfer_solution (2).csv")
+weight_list <- roundmat(df)
 print(weight_list)
 
-```
-
-```{r}
-# Function to calculate conflict scores
-# conflict <- function(weight_matrix) {
-#   n <- nrow(weight_matrix)
-#   conflict_score <- 0
-#   
-#   ## Get upper tri entries
-#   ww <- weight_matrix[upper.tri(weight_matrix)]
-#   ww <- ww[ww > 0] # keep only positive entries
-#   conflict_score <- sum((ww-1)^2)
-#   
-#   return(conflict_score)
-# }
-# 
-# conflictscore <- conflict(weight_matrix)
-# print(conflictscore)
+# Cumulative matrix
+cummat <- Reduce(`+`, weight_list, accumulate = TRUE)
 
 ```
 
 ```{r}
+# Function to calculate conflict score
 Final <- function (weight_list){
   wm <- Reduce(`+`, weight_list, accumulate = TRUE) # wm = cumulative weight matrix
 
 #cs <- lapply(cumulativemat, conflict)
 
 ## Round 5 and round 4
-wm5 <- wm[[5]] # magic number
-wm4 <- wm[[4]] # magic number
+wm5 <- wm[[2]] # magic number
+wm4 <- wm[[1]] # magic number
 
 ## Subtracting shows which people were paired in round 5
 weight5 <- wm5-wm4 # every entry with "1" was paired in round 5
