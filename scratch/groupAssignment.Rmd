@@ -81,59 +81,44 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r message = F}
 library(dplyr)
-
-# Function to generate round matrix
+# Function to make individual round matrices and combine them
 roundmat <- function(df) {
-  
-  # Extract student names
   students <- df[[1]]
-  
-  # Initialize the weight matrix
+  rounds <- ncol(df)-1
   n <- length(students)
-  weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
+  weight_list <- vector("list", length = rounds)
   
-  # Initialize a vector to store conflict scores for each round
-  conflict_scores <- numeric(ncol(df) - 1)
-  
-  weight_list <- vector("list", length = ncol(df)-1)
-  
-  # Loop through each round, update the weight matrix, and calculate the conflict score
-  for (round in 1:(ncol(df)-1)) { # Start from the second column to the last column
-    round_col <- df[[round+1]]
-    
-    ## within each round, create new weight matrix
+  # Step 1: Generate individual round matrices
+  for (round in 1:rounds) {
     weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
-    # Set diagonal to -99
     diag(weight_matrix) <- -99
-    
+    round_col <- df[[round + 1]]
     
     for (group in unique(round_col)) {
-      
       group_members <- which(round_col == group)
       for (i in 1:length(group_members)) {
         for (j in (i + 1):length(group_members)) {
-          if (i == j) next
-          weight_matrix[group_members[i], group_members[j]] <- weight_matrix[group_members[i], group_members[j]] + 1
-          weight_matrix[group_members[j], group_members[i]] <- weight_matrix[group_members[j], group_members[i]] + 1
+          weight_matrix[group_members[i], group_members[j]] <- 1
+          weight_matrix[group_members[j], group_members[i]] <- 1
         }
       }
     }
-    
+  # Step 2: Combine round matrices after all are made
     weight_list[[round]] <- weight_matrix
-    
   }
   
   return(weight_list)
-  }
+}
 
-df <- read.csv("../data/golfer_solution (2).csv")
-weight_list <- roundmat(df)
+# Example usage:
+weight_list <- roundmat(df2)
 print(weight_list)
 
-# Cumulative matrix
+# Cumulative Matrix
 cummat <- Reduce(`+`, weight_list, accumulate = TRUE)
 
 ```
+
 
 ```{r}
 # Function to calculate conflict score
