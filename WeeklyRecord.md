@@ -48,3 +48,5 @@ to separate .R in `functions` file
 
 ## July 29-August 2, Week 10
 - Added a set of functions to update group assignments to weight matrix and calculate conflict scores
+- Succeed on regenrating conflict scores of `good-enough-golfers.js`
+- Wrote reflection for the project
