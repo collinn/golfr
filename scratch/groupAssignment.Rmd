@@ -164,3 +164,18 @@ f2 <- function(round_weights) {
 }
 ```
 
+```{r}
+# Recreate GeneratePermutation from Java
+generatePermutation <- function(groups, ofSize) {
+
+  totalSize <- groups * ofSize
+  shuffledPlayers <- sample(1:totalSize)
+  groupedPlayers <- split(shuffledPlayers, ceiling(seq_along(shuffledPlayers) / ofSize))
+  
+  return(groupedPlayers)
+}
+
+generatePermutation(4, 3)
+
+```
+
