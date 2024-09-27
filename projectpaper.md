@@ -1,9 +1,15 @@
 ---
 title: "Iteratively Assigning Students into Groups with Arbitrary Constraints"
-author: "Collin Nolte, Hannah Kim, and Raj Jhanwar"
+author: "Collin Nolte, Hannah Kim"
 date: "2024-07-03"
 output: pdf_document
 ---
+
+# Abstract
+
+This research focuses on developing an R package that automates student group assignments, drawing inspiration from the social golfer problem (SGP), a combinatorial challenge that avoids repeated pairings across multiple rounds. The goal is to create an efficient tool for educators that simplifies the group formation process while considering various constraints, enhancing collaborative learning. By leveraging SGP principles, the project aims to streamline group assignments in larger classes, making the process more systematic and flexible.
+# 1 sentence of results can be added
+
 
 # Introduction
 ## Objective
