@@ -81,6 +81,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r message = F}
 library(dplyr)
+df <- read.csv("~/")
 # Function to make individual round matrices and combine them
 roundmat <- function(df) {
   students <- df[[1]]
@@ -111,14 +112,13 @@ roundmat <- function(df) {
 }
 
 # Example usage:
-weight_list <- roundmat(df2)
+weight_list <- roundmat(df)
 print(weight_list)
 
 # Cumulative Matrix
 cummat <- Reduce(`+`, weight_list, accumulate = TRUE)
 
 ```
-
 
 ```{r}
 # Function to calculate conflict score
@@ -167,15 +167,21 @@ f2 <- function(round_weights) {
 ```{r}
 # Recreate GeneratePermutation from Java
 generatePermutation <- function(groups, ofSize) {
-
+  # Total number of players
   totalSize <- groups * ofSize
-  shuffledPlayers <- sample(1:totalSize)
-  groupedPlayers <- split(shuffledPlayers, ceiling(seq_along(shuffledPlayers) / ofSize))
   
-  return(groupedPlayers)
+  firstGroupAssignment <- function() {
+    shuffledPlayers <- sample(1:totalSize)  # Shuffle the players again
+    split(shuffledPlayers, ceiling(seq_along(shuffledPlayers) / ofSize))  # Group the players
+  }
+  
+  # Generate 10 candidate group assignments as potential second groupings
+  candidates <- replicate(10, firstGroupAssignment(), simplify = FALSE)
+  
+  return(candidates)
 }
 
-generatePermutation(4, 3)
+candidates <- generatePermutation(4, 3)
 
 ```
 
