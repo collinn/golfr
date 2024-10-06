@@ -81,7 +81,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r message = F}
 library(dplyr)
-df <- read.csv("~/")
+df <- read.csv("data/golfer_solution (3).csv")
 # Function to make individual round matrices and combine them
 roundmat <- function(df) {
   students <- df[[1]]
@@ -96,14 +96,17 @@ roundmat <- function(df) {
     round_col <- df[[round + 1]]
     
     for (group in unique(round_col)) {
+      ## This below creates weight for a particular group
       group_members <- which(round_col == group)
-      for (i in 1:length(group_members)) {
+      for (i in seq_along(group_members)) {
         for (j in (i + 1):length(group_members)) {
+          if (j > length(group_members)) break
           weight_matrix[group_members[i], group_members[j]] <- 1
           weight_matrix[group_members[j], group_members[i]] <- 1
         }
       }
     }
+
   # Step 2: Combine round matrices after all are made
     weight_list[[round]] <- weight_matrix
   }
@@ -166,7 +169,7 @@ f2 <- function(round_weights) {
 
 ```{r}
 # Recreate GeneratePermutation from Java
-generatePermutation <- function(groups, ofSize) {
+generatePermutation <- function(groups = 4, ofSize = 3) {
   # Total number of players
   totalSize <- groups * ofSize
   
