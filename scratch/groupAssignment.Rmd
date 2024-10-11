@@ -1,4 +1,4 @@
----
+fd---
 title: "Group Assignment"
 author: "Hannah Kim"
 date: "2024-05-28"
@@ -238,8 +238,8 @@ Conflict <- function(round1_matrix, mutation_weights) {
   # Combine the first round matrix with each of the 10 candidate matrices for round 2
   combined_matrices <- lapply(mutation_weights, function(candidate_matrix) {
     # Calculate the cumulative matrix: round 1 + candidate matrix
-    cumulative_matrix <- round1_matrix + candidate_matrix # how do I add two matrices?
-    return(list(round1_matrix, cumulative_matrix))  # List of round 1 and cumulative matrix for each candidate
+    #cumulative_matrix <- round1_matrix + candidate_matrix # how do I add two matrices?
+    return(list(round1_matrix, candidate_matrix))  # List of round 1 and cumulative matrix for each candidate
   })
   
   # Use the Final function to calculate the conflict score for each candidate
@@ -250,7 +250,8 @@ Conflict <- function(round1_matrix, mutation_weights) {
   return(conflict_scores)  # Returns conflict scores for all 10 candidates
 }
 
-round1_matrix <- roundmat(df)[1]
+round1_matrix <- roundmat(df)[[1]]
+#round1_matrix <- roundmat(df)[1]
 
 conflict_scores <- Conflict(round1_matrix, mutation_weights)
 
