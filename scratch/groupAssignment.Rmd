@@ -81,7 +81,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r message = F}
 library(dplyr)
-df <- read.csv("data/golfer_solution (3).csv")
+df <- read.csv("../data/golfer_solution (3).csv")
 # Function to make individual round matrices and combine them
 roundmat <- function(df) {
   students <- df[[1]]
@@ -169,7 +169,7 @@ f2 <- function(round_weights) {
 
 ```{r}
 # Recreate GeneratePermutation from Java
-generatePermutation <- function(groups = 4, ofSize = 3) {
+generatePermutation <- function(groups, ofSize) {
   # Total number of players
   totalSize <- groups * ofSize
   
@@ -185,6 +185,76 @@ generatePermutation <- function(groups = 4, ofSize = 3) {
 }
 
 candidates <- generatePermutation(4, 3)
+
+```
+
+```{r}
+GenerateMutation <- function(candidates) {
+   # Total number of players
+  n <- length(unlist(candidates[[1]]))
+  students <- as.character(1:n)# Create student labels as 1 to n
+  
+  # Initialize the weight list to store the weight matrices for all candidates
+  weight_list <- vector("list", length = length(candidates))
+  
+  # Iterate over each candidate (i.e., each potential second group assignment)
+  for (cand in seq_along(candidates)) {
+    # Initialize a weight matrix for the current candidate
+    weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
+    diag(weight_matrix) <- -99
+    # Get the groups for the current candidate
+    groups <- candidates[[cand]]
+    
+    # Iterate over each group in the candidate
+    for (group in groups) {
+      # Find the indices of the players in the group
+      group_members <- unlist(group)
+      
+      # Update the weight matrix for the pairs within this group
+      for (i in seq_along(group_members)) {
+        for (j in (i + 1):length(group_members)) {
+          if (j > length(group_members)) break
+          weight_matrix[group_members[i], group_members[j]] <- 1
+          weight_matrix[group_members[j], group_members[i]] <- 1
+        }
+      }
+    }
+    
+    # Add the completed weight matrix to the list of weight matrices
+    weight_list[[cand]] <- weight_matrix
+  }
+  
+  return(weight_list)
+}
+
+
+candidates <- generatePermutation(4, 3)
+mutation_weights <- GenerateMutation(candidates)
+
+```
+
+```{r}
+Conflict <- function(round1_matrix, mutation_weights) {
+  # Combine the first round matrix with each of the 10 candidate matrices for round 2
+  combined_matrices <- lapply(mutation_weights, function(candidate_matrix) {
+    # Calculate the cumulative matrix: round 1 + candidate matrix
+    cumulative_matrix <- round1_matrix + candidate_matrix # how do I add two matrices?
+    return(list(round1_matrix, cumulative_matrix))  # List of round 1 and cumulative matrix for each candidate
+  })
+  
+  # Use the Final function to calculate the conflict score for each candidate
+  conflict_scores <- lapply(combined_matrices, function(weight_list) {
+    Final(weight_list)
+  })
+  
+  return(conflict_scores)  # Returns conflict scores for all 10 candidates
+}
+
+round1_matrix <- roundmat(df)[1]
+
+conflict_scores <- Conflict(round1_matrix, mutation_weights)
+
+conflict_scores
 
 ```
 
