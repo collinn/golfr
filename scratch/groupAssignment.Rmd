@@ -149,24 +149,6 @@ Final <- function(weight_list) {
 Final(weight_list)
 ```
 
-
-```{r}
-f <- function(df) {
-  studnets <- df[[1]]
-  round_weights <- vector("list", n)
-  
-  for (i in rounds) {
-    round_weights[[i]] <- compute_round_weight(df[[i]])
-  }
-  return(round_weights)
-}
-
-f2 <- function(round_weights) {
-  # 1: compute cumulative weights using Reduce
-  # 2: use both of these to compute conflict scores
-}
-```
-
 ```{r}
 # Recreate GeneratePermutation from Java
 generatePermutation <- function(groups, ofSize) {
@@ -238,8 +220,8 @@ Conflict <- function(round1_matrix, mutation_weights) {
   # Combine the first round matrix with each of the 10 candidate matrices for round 2
   combined_matrices <- lapply(mutation_weights, function(candidate_matrix) {
     # Calculate the cumulative matrix: round 1 + candidate matrix
-    #cumulative_matrix <- round1_matrix + candidate_matrix # how do I add two matrices?
-    return(list(round1_matrix, candidate_matrix))  # List of round 1 and cumulative matrix for each candidate
+    updated_matrix <- cumulative_matrix + candidate_matrix
+    return(list(cumulative_matrix, updated_matrix))  # List of round 1 and cumulative matrix for each candidate
   })
   
   # Use the Final function to calculate the conflict score for each candidate
@@ -258,4 +240,3 @@ conflict_scores <- Conflict(round1_matrix, mutation_weights)
 conflict_scores
 
 ```
-
