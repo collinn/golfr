@@ -12,7 +12,7 @@ updatemat <- function(initialmat, group_assignments, students) {
         if (j != k) {
           rn <- which(rownames(initialmat) == groupMembers[j])
           cn <- which(colnames(initialmat) == groupMembers[k])
-          initialmat[rn, cn] <- 1
+          initialmat[rn, cn] <- 1 + initialmat[rn, cn]
         }
       }
     }
