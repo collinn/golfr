@@ -92,7 +92,7 @@ roundmat <- function(df) {
   # Step 1: Generate individual round matrices
   for (round in 1:rounds) {
     weight_matrix <- matrix(0, nrow = n, ncol = n, dimnames = list(students, students))
-    diag(weight_matrix) <- -99
+    diag(weight_matrix) <- 0
     round_col <- df[[round + 1]]
     
     for (group in unique(round_col)) {
@@ -239,3 +239,22 @@ conflict_scores <- Conflict(round1_matrix, mutation_weights)
 conflict_scores
 
 ```
+```{r}
+matrix3 <- matrix(c(
+  -99,  0,   2,   1,
+    0, -99,   1,   2,
+    2,   1, -99,   0,
+    1,   2,   0, -99
+), nrow = 4, ncol = 4, byrow = TRUE, dimnames = dimnames_list)
+
+# Define the fourth edited matrix with -99 on the diagonal
+matrix4 <- matrix(c(
+  -99,  1,   1,   1,
+    1, -99,   1,   1,
+    1,   1, -99,   1,
+    1,   1,   1, -99
+), nrow = 4, ncol = 4, byrow = TRUE, dimnames = dimnames_list)
+
+matrix4
+```
+
